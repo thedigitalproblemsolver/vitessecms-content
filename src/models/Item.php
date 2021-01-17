@@ -4,7 +4,7 @@ namespace VitesseCms\Content\Models;
 
 use VitesseCms\Core\Services\ViewService;
 use VitesseCms\Database\AbstractCollection;
-use VitesseCms\Core\Models\Datafield;
+use VitesseCms\Datafield\Models\Datafield;
 use Phalcon\Di;
 
 class Item extends AbstractCollection
