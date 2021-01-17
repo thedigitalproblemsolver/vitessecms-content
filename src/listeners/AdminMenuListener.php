@@ -23,7 +23,7 @@ class AdminMenuListener
                     );
                 endforeach;
 
-                $adminMenu->addDropbown('Content', $children);
+                $adminMenu->addDropdown('Content', $children);
             endif;
         endif;
     }
