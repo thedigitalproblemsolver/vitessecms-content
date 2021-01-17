@@ -4,8 +4,8 @@ namespace VitesseCms\Content\Models;
 
 use VitesseCms\Core\Services\ViewService;
 use VitesseCms\Database\AbstractCollection;
-use VitesseCms\Core\Models\Datafield;
 use Phalcon\Di;
+use VitesseCms\Datafield\Models\Datafield;
 
 class Item extends AbstractCollection
 {
@@ -67,7 +67,7 @@ class Item extends AbstractCollection
         $item = parent::findById($id);
         $viewService = new ViewService(Di::getDefault()->get('configuration'));
         if (self::$renderFields && $item) :
-            $dataFieldTemplates = (new Datafield)->getTemplates();
+            $dataFieldTemplates = (new Datafield())->getTemplates();
             foreach ($dataFieldTemplates as $path => $name) :
                 $item->set($name, $viewService->renderTemplate(
                     'core',
