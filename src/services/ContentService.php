@@ -29,6 +29,7 @@ class ContentService extends AbstractInjectableService
     {
         $this->view = $viewService;
 
+        /** TODO make module based */
         if (!$this->eventsManager->hasListeners('contentTag')) :
             $this->eventsManager->attach('contentTag', new TagDiscountListener());
             $this->eventsManager->attach('contentTag', new TagItemListener());
