@@ -5,31 +5,31 @@ namespace VitesseCms\Content\Forms;
 use VitesseCms\Content\Repositories\AdminRepositoryCollection;
 use VitesseCms\Form\AbstractForm;
 use VitesseCms\Content\Models\Item;
+use VitesseCms\Form\AbstractFormWithRepository;
+use VitesseCms\Form\Interfaces\FormWithRepositoryInterface;
 
-class ItemForm extends AbstractForm
+class ItemForm extends AbstractFormWithRepository
 {
     /**
      * @var AdminRepositoryCollection
      */
     protected $repositories;
 
-    public function build(Item $item): ItemForm
+    /**
+     * @var Item
+     */
+    protected $_entity;
+
+    public function buildForm(): FormWithRepositoryInterface
     {
-        $datagroup = $this->repositories->datagroup->getById($item->getDatagroup(), false);
+        $datagroup = $this->repositories->datagroup->getById($this->_entity->getDatagroup(), false);
         if ($datagroup !== null) {
-            $datagroup->buildItemForm($this, $item);
+            $datagroup->buildItemForm($this, $this->_entity);
 
             $this->addNumber('%ADMIN_ORDERING%', 'ordering')
                 ->addAcl('%ADMIN_PERMISSION_ROLES%', 'roles')
                 ->addSubmitButton('%CORE_SAVE%');
         }
-
-        return $this;
-    }
-
-    public function setRepositories(AdminRepositoryCollection $repositories): ItemForm
-    {
-        $this->repositories = $repositories;
 
         return $this;
     }

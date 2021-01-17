@@ -29,39 +29,18 @@ class AdminitemController extends AbstractAdminController implements AdminReposi
         AbstractForm $form = null
     ): void {
         if ($itemId === null) :
-            $parentId = $this->request->get('parentId', null);
-            parent::editAction($itemId, $template, $templatePath, (new NewItemForm())
-                ->setRepositories($this->repositories)
-                ->setParentId($parentId)
-                ->build()
-            );
-        else :
-            parent::editAction($itemId, $template, $templatePath, (new ItemForm())
-                ->setRepositories($this->repositories)
-                ->build($this->repositories->item->getById($itemId, false))
-            );
+            $this->classForm = NewItemForm::class;
         endif;
+
+        parent::editAction($itemId);
     }
 
     public function saveAction(?string $itemId = null, AbstractCollection $item = null, AbstractForm $form = null): void
     {
         if ($itemId === null) :
-            parent::saveAction(
-                $itemId,
-                null,
-                (new NewItemForm())
-                    ->setRepositories($this->repositories)
-                    ->build()
-            );
-        else :
-            $item = $this->repositories->item->getById($itemId, false, false);
-            parent::saveAction(
-                $itemId,
-                null,
-                (new ItemForm())
-                    ->setRepositories($this->repositories)
-                    ->build($item)
-            );
+            $this->classForm = NewItemForm::class;
         endif;
+
+        parent::saveAction($itemId);
     }
 }

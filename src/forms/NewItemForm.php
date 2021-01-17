@@ -4,25 +4,23 @@ namespace VitesseCms\Content\Forms;
 
 use VitesseCms\Content\Repositories\AdminRepositoryCollection;
 use VitesseCms\Form\AbstractForm;
+use VitesseCms\Form\AbstractFormWithRepository;
 use VitesseCms\Form\Helpers\ElementHelper;
+use VitesseCms\Form\Interfaces\FormWithRepositoryInterface;
 use VitesseCms\Form\Models\Attributes;
 
-class NewItemForm extends AbstractForm
+class NewItemForm extends AbstractFormWithRepository
 {
     /**
      * @var AdminRepositoryCollection
      */
     protected $repositories;
 
-    /**
-     * @var ?string
-     */
-    protected $parentId;
-
-    public function build(): NewItemForm
+    public function buildForm(): FormWithRepositoryInterface
     {
-        if ($this->parentId !== null) :
-            $parent = $this->repositories->item->getById($this->parentId, false);
+        $parentId =$this->request->get('parentId', null);
+        if (!empty($parentId)) :
+            $parent = $this->repositories->item->getById($parentId, false);
             $datagroups = $this->repositories->datagroup->findAllByParentId($parent->getDatagroup());
         else :
             $datagroups = $this->repositories->datagroup->findAll(null,false);
@@ -32,26 +30,13 @@ class NewItemForm extends AbstractForm
             '%ADMIN_TYPE%',
             'datagroup',
             (new Attributes())
-                ->setRequired(true)
+                ->setRequired()
                 ->setOptions(ElementHelper::modelIteratorToOptions($datagroups))
-        )
-            ->addHidden('parentId', $this->parentId)
+            )
+            ->addHidden('parentId', $parentId)
             ->addAcl('%ADMIN_PERMISSION_ROLES%', 'roles')
-            ->addSubmitButton('%CORE_SAVE%');
-
-        return $this;
-    }
-
-    public function setParentId(?string $parentId): NewItemForm
-    {
-        $this->parentId = $parentId;
-
-        return $this;
-    }
-
-    public function setRepositories(AdminRepositoryCollection $repositories): NewItemForm
-    {
-        $this->repositories = $repositories;
+            ->addSubmitButton('%CORE_SAVE%')
+        ;
 
         return $this;
     }
