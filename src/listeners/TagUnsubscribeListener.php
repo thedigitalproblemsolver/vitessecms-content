@@ -4,6 +4,9 @@ namespace VitesseCms\Content\Listeners;
 
 use VitesseCms\Content\Helpers\EventVehicleHelper;
 
+/**
+ * @deprecated move to communication
+ */
 class TagUnsubscribeListener extends AbstractTagListener
 {
     public function __construct()

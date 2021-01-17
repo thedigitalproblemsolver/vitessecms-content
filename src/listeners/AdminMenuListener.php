@@ -16,7 +16,6 @@ class AdminMenuListener
             if ($group !== null) :
                 $children = new AdminMenuNavBarChildren();
 
-                /** @var Datagroup $contentGroup */
                 foreach ($group->getDatagroups() as $contentGroup) :
                     $children->addChild(
                         $contentGroup->getNameField(),

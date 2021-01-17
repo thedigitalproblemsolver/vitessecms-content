@@ -7,21 +7,15 @@ use VitesseCms\Shop\Models\Country;
 use VitesseCms\Shop\Models\Order;
 
 /**
- * Class TagUnsubscribeListener
+ * @deprecated move to shop
  */
 class TagOrderSendDateListener extends AbstractTagListener
 {
-    /**
-     * TagShopTrackAndTraceListener constructor.
-     */
     public function __construct()
     {
         $this->name = 'ORDER_SENDDATE';
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function parse(EventVehicleHelper $eventVehicle, string $tagString): void
     {
         $replace = '';

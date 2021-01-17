@@ -12,6 +12,9 @@ use VitesseCms\Shop\Factories\DiscountFactory;
 use VitesseCms\Shop\Models\Discount;
 use \DateTime;
 
+/**
+ * @deprecated move to shop
+ */
 class TagDiscountListener extends AbstractTagListener
 {
     public function __construct()

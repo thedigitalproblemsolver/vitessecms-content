@@ -8,6 +8,9 @@ use VitesseCms\Content\Models\Item;
 use VitesseCms\Database\Utils\MongoUtil;
 use Phalcon\Di;
 
+/**
+ * @deprecated move to communication
+ */
 class TagSubscribeListener extends AbstractTagListener
 {
     public function __construct()

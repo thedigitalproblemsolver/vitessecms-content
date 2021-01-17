@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace VitesseCms\Content\Listeners;
 
@@ -7,22 +7,15 @@ use VitesseCms\Shop\Models\Order;
 use VitesseCms\Shop\Models\Shipping;
 
 /**
- * Class TagUnsubscribeListener
+ * @deprecated move to shop
  */
-
 class TagShopTrackAndTraceListener extends AbstractTagListener
 {
-    /**
-     * TagShopTrackAndTraceListener constructor.
-     */
     public function __construct()
     {
         $this->name = 'TRACKANDTRACE';
     }
 
-    /**
-     * @inheritdoc
-     */
     protected function parse(EventVehicleHelper $eventVehicle, string $tagString): void
     {
         if(!empty($eventVehicle->_('orderId'))) :
