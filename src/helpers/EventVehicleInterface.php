@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace VitesseCms\Content\Interfaces;
+namespace VitesseCms\Content\Helpers;
 
 interface EventVehicleInterface
 {

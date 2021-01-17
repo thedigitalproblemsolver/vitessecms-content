@@ -4,9 +4,9 @@ namespace VitesseCms\Content\Controllers;
 
 use VitesseCms\Admin\AbstractAdminController;
 use VitesseCms\Content\Forms\NewItemForm;
-use VitesseCms\Content\Interfaces\AdminRepositoriesInterface;
 use VitesseCms\Content\Models\Item;
 use VitesseCms\Content\Forms\ItemForm;
+use VitesseCms\Content\Repositories\AdminRepositoriesInterface;
 use VitesseCms\Database\AbstractCollection;
 use VitesseCms\Form\AbstractForm;
 

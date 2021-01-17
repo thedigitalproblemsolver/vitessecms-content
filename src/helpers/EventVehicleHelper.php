@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
 
 namespace VitesseCms\Content\Helpers;
-
-use VitesseCms\Content\Interfaces\EventVehicleInterface;
+;
 use VitesseCms\Core\Interfaces\BaseObjectInterface;
 use VitesseCms\Core\Services\UrlService;
 use VitesseCms\Core\Services\ViewService;

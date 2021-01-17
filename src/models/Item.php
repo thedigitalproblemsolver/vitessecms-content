@@ -158,4 +158,11 @@ class Item extends AbstractCollection
 
         return $this;
     }
+
+    public function setDatagroup(string $datagroup): Item
+    {
+        $this->datagroup = $datagroup;
+
+        return $this;
+    }
 }

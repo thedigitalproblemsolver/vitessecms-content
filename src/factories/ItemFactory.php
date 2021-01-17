@@ -1,25 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace VitesseCms\Content\Factories;
 
 use VitesseCms\Content\Models\Item;
 use VitesseCms\Database\Utils\MongoUtil;
 
-/**
- * Class ItemFactory
- */
 class ItemFactory
 {
-    /**
-     * @param string $title
-     * @param string $datagroupId
-     * @param array $fieldValues
-     * @param bool $published
-     * @param string|null $parentId
-     * @param int $ordering
-     *
-     * @return Item
-     */
     public static function create(
         string $title,
         string $datagroupId,
@@ -30,10 +17,10 @@ class ItemFactory
     ): Item {
         $item = new Item();
         $item->set('name', $title, true);
-        $item->set('datagroup', $datagroupId);
-        $item->set('published', $published);
-        $item->set('ordering', $ordering);
-        $item->set('parentId', $parentId);
+        $item->setDatagroup($datagroupId);
+        $item->setPublished($published);
+        $item->setOrdering($ordering);
+        $item->setParent($parentId);
 
         if( $parentId != null && MongoUtil::isObjectId($parentId)) :
             $parentItem = Item::findById($parentId);

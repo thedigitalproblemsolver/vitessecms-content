@@ -6,6 +6,7 @@ use VitesseCms\Admin\Utils\AdminUtil;
 use VitesseCms\Communication\Services\MailchimpService;
 use VitesseCms\Content\Repositories\AdminRepositoryCollection;
 use VitesseCms\Content\Repositories\ItemRepository;
+use VitesseCms\Content\Repositories\RepositoryCollection;
 use VitesseCms\Core\AbstractModule;
 use VitesseCms\Core\Repositories\DatagroupRepository;
 use Phalcon\DiInterface;
@@ -27,6 +28,10 @@ class Module extends AbstractModule
             $di->setShared('repositories', new AdminRepositoryCollection(
                 new ItemRepository(),
                 new DatagroupRepository()
+            ));
+        else :
+            $di->setShared('repositories', new RepositoryCollection(
+                new ItemRepository()
             ));
         endif;
     }

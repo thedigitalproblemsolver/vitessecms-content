@@ -2,11 +2,14 @@
 
 namespace VitesseCms\Content\Controllers;
 
+use VitesseCms\Content\Repositories\RepositoriesInterface;
 use VitesseCms\Core\AbstractController;
 use VitesseCms\Content\Models\Item;
 use VitesseCms\Core\Helpers\ItemHelper;
+use VitesseCms\Database\Models\FindValue;
+use VitesseCms\Database\Models\FindValueIterator;
 
-class IndexController extends AbstractController
+class IndexController extends AbstractController implements RepositoriesInterface
 {
     public function indexAction(): void
     {
@@ -18,23 +21,25 @@ class IndexController extends AbstractController
         $result = ['items' => []];
 
         if ($this->request->isAjax() && strlen($this->request->get('search')) > 1) :
-            Item::setFindValue(
-                'name.'.$this->configuration->getLanguageShort(),
-                $this->request->get('search'),
-                'like'
-            );
-            $items = Item::findAll();
+            $items = $this->repositories->item->findAll(new FindValueIterator(
+                [new FindValue(
+                    'name.'.$this->configuration->getLanguageShort(),
+                    $this->request->get('search'),
+                    'like'
+                )]
+            ));
 
-            if($items) :
-                foreach ($items as $item ) :
-                    /** @var Item $item */
+            if($items->count() > 0) :
+                while ($items->valid()) :
+                    $item = $items->current();
                     $path = ItemHelper::getPathFromRoot($item);
                     $tmp = [
                         'id' => (string)$item->getId(),
                         'name' => implode(' - ',$path),
                     ];
                     $result['items'][] = $tmp;
-                endforeach;
+                    $item = $items->next();
+                endwhile;
             endif;
         endif;
 
@@ -48,8 +53,8 @@ class IndexController extends AbstractController
             && !empty($this->request->getPost('latitude'))
             && !empty($this->request->getPost('longitude'))
         ) {
-            $item = Item::findById($this->request->getPost('id'));
-            if($item):
+            $item = $this->repositories->item->getById($this->request->getPost('id'));
+            if($item !== null):
                 $item->set('latitude',$this->request->getPost('latitude'))
                     ->set('longitude',$this->request->getPost('longitude'))
                     ->save()

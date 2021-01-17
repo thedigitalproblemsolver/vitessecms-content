@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
 
-namespace VitesseCms\Content\Interfaces;
+namespace VitesseCms\Content\Repositories;
 
-use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Core\Repositories\DatagroupRepository;
 
 /**
