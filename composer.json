@@ -1,11 +1,11 @@
 {
   "name": "vitessecms/content",
   "type": "library",
-  "description": "Block module for VitesseCms",
+  "description": "Content module for VitesseCms",
   "keywords": ["php","phalcon","vitessecms"],
   "homepage": "https://github.com/thedigitalproblemsolver/VitesseCMS",
   "license": "GPL-2.0-or-later",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "authors": [
     {
       "name": "Jasper Jaklofsky",
@@ -16,5 +16,8 @@
     "psr-4": {
       "VitesseCms\\Content\\": "src/"
     }
+  },
+  "require": {
+    "chriskonnertz/open-graph": "^1.0"
   }
 }
