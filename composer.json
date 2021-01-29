@@ -21,6 +21,6 @@
     "chriskonnertz/open-graph": "^1.0",
     "vitessecms/language": "~0.0.1",
     "vitessecms/sef": "~0.0.1",
-    "vitessecms/setting": "~0.0.1"
+    "vitessecms/setting": "~0.0.2"
   }
 }
