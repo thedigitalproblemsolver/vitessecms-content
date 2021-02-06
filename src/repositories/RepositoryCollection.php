@@ -2,7 +2,7 @@
 
 namespace VitesseCms\Content\Repositories;
 
-use VitesseCms\Core\Repositories\DatagroupRepository;
+use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Database\Interfaces\BaseRepositoriesInterface;
 
 class RepositoryCollection
