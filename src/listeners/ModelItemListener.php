@@ -6,7 +6,7 @@ use VitesseCms\Content\Models\Item;
 use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Core\Interfaces\InjectableInterface;
 use VitesseCms\Core\Models\Datagroup;
-use VitesseCms\Core\Repositories\DatagroupRepository;
+use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Core\Services\CacheService;
 use VitesseCms\Database\AbstractCollection;
 use VitesseCms\Database\Utils\MongoUtil;
