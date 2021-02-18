@@ -78,13 +78,14 @@ class AdminItemControllerListener
         AbstractCollection $parent,
         array &$parentOptions = [],
         array $prefix = []
-    ): void {
+    ): void
+    {
         Item::setFindValue('parentId', (string)$parent->getId());
         $prefix[] = $parent->_('name');
         $items = Item::findAll();
         foreach ($items as $item) :
             if ($item->hasChildren()):
-                $parentOptions[(string)$item->getId()] = implode(' > ', $prefix).' > '.$item->_('name');
+                $parentOptions[(string)$item->getId()] = implode(' > ', $prefix) . ' > ' . $item->_('name');
                 $this->getParentOptionsFromItem($item, $parentOptions, $prefix);
             endif;
         endforeach;

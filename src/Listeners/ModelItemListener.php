@@ -34,6 +34,77 @@ class ModelItemListener
         endif;
     }
 
+    protected function setSeoTitle(Item $item): Item
+    {
+        Datagroup::setFindPublished(false);
+        /** @var Datagroup $datagroup */
+        $datagroup = Datagroup::findById($item->getDatagroup());
+
+        $slugCategories = [];
+        $slugDatagroups = array_reverse($datagroup->getSeoTitleCategories());
+        /** @var Item $previousItem */
+        $previousItem = clone $item;
+        foreach ($slugDatagroups as $datagroupObject) :
+            if (is_array($datagroupObject) && $previousItem) :
+                Item::setFindPublished(false);
+                if ($datagroupObject['published'] && $previousItem->getParentId() !== null):
+                    $previousItem = Item::findById($previousItem->getParentId());
+                    $slugCategories[] = $previousItem;
+                endif;
+            endif;
+        endforeach;
+
+        $slugDatafields = [];
+        foreach ($datagroup->getSeoTitleDatafields() as $datafieldObject) :
+            if (is_array($datafieldObject) && $datafieldObject['published']) :
+                $slugDatafields[] = Datafield::findById($datafieldObject['id']);
+            endif;
+        endforeach;
+
+        $seoTitle = [];
+        Language::setFindPublished(false);
+        $languages = Language::findAll();
+        /** @var Language $language */
+        foreach ($languages as $language) :
+            if (!isset($seoTitle[$language->getShortCode()])) :
+                $seoTitle[$language->getShortCode()] = '';
+            endif;
+
+            $slugParts = [];
+            /** @var Datafield $datafield */
+            foreach ($slugDatafields as $datafield) :
+                $datafieldResult = $item->_($datafield->getCallingName(), $language->getShortCode());
+                if (!empty($datafieldResult)) :
+                    if (is_string($datafieldResult)) :
+                        $slugParts[] = $datafieldResult;
+                    elseif (is_array($datafieldResult)) :
+                        foreach ($datafieldResult as $result) :
+                            if (MongoUtil::isObjectId($result)) :
+                                $resultItem = Item::findById($result);
+                                if ($resultItem !== null) :
+                                    $slugParts[] = $resultItem->_('name');
+                                endif;
+                            endif;
+                        endforeach;
+                    endif;
+                endif;
+            endforeach;
+
+            if (count($slugCategories) > 0):
+                /** @var AbstractCollection $slugCategory */
+                foreach ($slugCategories as $slugCategory) :
+                    $slugParts[] = $slugCategory->_('name', $language->getShortCode());
+                endforeach;
+            endif;
+
+            $seoTitle[$language->getShortCode()] = implode(' ', $slugParts);
+        endforeach;
+
+        $item->setSeoTitle($seoTitle);
+
+        return $item;
+    }
+
     protected function setSlugs(Item $item): Item
     {
         $datagroupRepository = new DatagroupRepository();
@@ -110,77 +181,6 @@ class ModelItemListener
 
         $item->setSlugs($slugs);
         SefHelper::saveRedirectFromItem((string)$item->getId(), $slugs);
-
-        return $item;
-    }
-
-    protected function setSeoTitle(Item $item): Item
-    {
-        Datagroup::setFindPublished(false);
-        /** @var Datagroup $datagroup */
-        $datagroup = Datagroup::findById($item->getDatagroup());
-
-        $slugCategories = [];
-        $slugDatagroups = array_reverse($datagroup->getSeoTitleCategories());
-        /** @var Item $previousItem */
-        $previousItem = clone $item;
-        foreach ($slugDatagroups as $datagroupObject) :
-            if (is_array($datagroupObject) && $previousItem) :
-                Item::setFindPublished(false);
-                if ($datagroupObject['published'] && $previousItem->getParentId() !== null):
-                    $previousItem = Item::findById($previousItem->getParentId());
-                    $slugCategories[] = $previousItem;
-                endif;
-            endif;
-        endforeach;
-
-        $slugDatafields = [];
-        foreach ($datagroup->getSeoTitleDatafields() as $datafieldObject) :
-            if (is_array($datafieldObject) && $datafieldObject['published']) :
-                $slugDatafields[] = Datafield::findById($datafieldObject['id']);
-            endif;
-        endforeach;
-
-        $seoTitle = [];
-        Language::setFindPublished(false);
-        $languages = Language::findAll();
-        /** @var Language $language */
-        foreach ($languages as $language) :
-            if (!isset($seoTitle[$language->getShortCode()])) :
-                $seoTitle[$language->getShortCode()] = '';
-            endif;
-
-            $slugParts = [];
-            /** @var Datafield $datafield */
-            foreach ($slugDatafields as $datafield) :
-                $datafieldResult = $item->_($datafield->getCallingName(), $language->getShortCode());
-                if (!empty($datafieldResult)) :
-                    if (is_string($datafieldResult)) :
-                        $slugParts[] = $datafieldResult;
-                    elseif (is_array($datafieldResult)) :
-                        foreach ($datafieldResult as $result) :
-                            if (MongoUtil::isObjectId($result)) :
-                                $resultItem = Item::findById($result);
-                                if ($resultItem !== null) :
-                                    $slugParts[] = $resultItem->_('name');
-                                endif;
-                            endif;
-                        endforeach;
-                    endif;
-                endif;
-            endforeach;
-
-            if (count($slugCategories) > 0):
-                /** @var AbstractCollection $slugCategory */
-                foreach ($slugCategories as $slugCategory) :
-                    $slugParts[] = $slugCategory->_('name', $language->getShortCode());
-                endforeach;
-            endif;
-
-            $seoTitle[$language->getShortCode()] = implode(' ', $slugParts);
-        endforeach;
-
-        $item->setSeoTitle($seoTitle);
 
         return $item;
     }

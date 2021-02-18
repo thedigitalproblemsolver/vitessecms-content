@@ -11,9 +11,9 @@ abstract class AbstractTagListener
 
     public function apply(Event $event, EventVehicleHelper $contentVehicle): void
     {
-        if($this->hasTag($contentVehicle->_('content'))) :
+        if ($this->hasTag($contentVehicle->_('content'))) :
             $tagsFromBody = $this->getTagsFromBody($contentVehicle->_('content'));
-            if(\is_array($tagsFromBody) && isset($tagsFromBody[1]) && \is_array($tagsFromBody[1])) :
+            if (\is_array($tagsFromBody) && isset($tagsFromBody[1]) && \is_array($tagsFromBody[1])) :
                 foreach ($tagsFromBody[1] as $tagString) :
                     $this->parse($contentVehicle, $tagString);
                 endforeach;
@@ -21,17 +21,17 @@ abstract class AbstractTagListener
         endif;
     }
 
+    protected function hasTag(string $content): bool
+    {
+        return (bool)substr_count($content, '{' . $this->name);
+    }
+
     protected function getTagsFromBody(string $content): array
     {
-        preg_match_all('/{'.$this->name.'(.*?)\}/', $content, $tagsFromBody);
+        preg_match_all('/{' . $this->name . '(.*?)\}/', $content, $tagsFromBody);
 
         return $tagsFromBody;
     }
 
-    protected function hasTag(string $content): bool
-    {
-        return (bool)substr_count($content, '{'.$this->name);
-    }
-
-    abstract protected function parse(EventVehicleHelper $contentVehicle, string $tagString):void;
+    abstract protected function parse(EventVehicleHelper $contentVehicle, string $tagString): void;
 }

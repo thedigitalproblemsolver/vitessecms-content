@@ -23,19 +23,19 @@ class IndexController extends AbstractController implements RepositoriesInterfac
         if ($this->request->isAjax() && strlen($this->request->get('search')) > 1) :
             $items = $this->repositories->item->findAll(new FindValueIterator(
                 [new FindValue(
-                    'name.'.$this->configuration->getLanguageShort(),
+                    'name.' . $this->configuration->getLanguageShort(),
                     $this->request->get('search'),
                     'like'
                 )]
             ));
 
-            if($items->count() > 0) :
+            if ($items->count() > 0) :
                 while ($items->valid()) :
                     $item = $items->current();
                     $path = ItemHelper::getPathFromRoot($item);
                     $tmp = [
                         'id' => (string)$item->getId(),
-                        'name' => implode(' - ',$path),
+                        'name' => implode(' - ', $path),
                     ];
                     $result['items'][] = $tmp;
                     $item = $items->next();
@@ -48,17 +48,16 @@ class IndexController extends AbstractController implements RepositoriesInterfac
 
     public function setGeoCoordinatesAction(): void
     {
-        if(
+        if (
             $this->request->isAjax()
             && !empty($this->request->getPost('latitude'))
             && !empty($this->request->getPost('longitude'))
         ) {
             $item = $this->repositories->item->getById($this->request->getPost('id'));
-            if($item !== null):
-                $item->set('latitude',$this->request->getPost('latitude'))
-                    ->set('longitude',$this->request->getPost('longitude'))
-                    ->save()
-                ;
+            if ($item !== null):
+                $item->set('latitude', $this->request->getPost('latitude'))
+                    ->set('longitude', $this->request->getPost('longitude'))
+                    ->save();
             endif;
         }
 

@@ -12,7 +12,8 @@ class RepositoryCollection
      */
     public $item;
 
-    public function __construct(ItemRepository $itemRepository) {
+    public function __construct(ItemRepository $itemRepository)
+    {
         $this->item = $itemRepository;
     }
 }

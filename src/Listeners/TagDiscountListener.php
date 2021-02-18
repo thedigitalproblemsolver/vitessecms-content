@@ -80,6 +80,15 @@ class TagDiscountListener extends AbstractTagListener
         );
     }
 
+    protected function renderDiscountTag(Discount $discount, string $template, ViewService $viewService): string
+    {
+        return $viewService->renderTemplate(
+            $template,
+            'communication/tags/discount/',
+            ['discount' => $discount]
+        );
+    }
+
     protected function getPersonalOnOrder(BaseObjectInterface $contentVehicle, array $options): Discount
     {
         $email = '';
@@ -105,15 +114,6 @@ class TagDiscountListener extends AbstractTagListener
         return $discount;
     }
 
-    protected function renderDiscountTag(Discount $discount, string $template, ViewService $viewService): string
-    {
-        return $viewService->renderTemplate(
-            $template,
-            'communication/tags/discount/',
-            ['discount' => $discount]
-        );
-    }
-
     protected function createRandomDiscount(string $target, ?array $options = null): Discount
     {
         $amount = 0;
@@ -125,7 +125,7 @@ class TagDiscountListener extends AbstractTagListener
         endif;
 
         if (!empty($options[2])) :
-            $amount = (int) $options[2];
+            $amount = (int)$options[2];
         endif;
 
         if (!empty($options[3])) :

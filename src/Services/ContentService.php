@@ -42,6 +42,30 @@ class ContentService extends AbstractInjectableService
         $this->eventInputs = [];
     }
 
+    public function parseContent(
+        string $content,
+        bool $parseTags = true,
+        bool $parseSettings = true
+    ): string
+    {
+        if ($parseTags) :
+            $content = $this->parseListeners($content, 'contentTag');
+        endif;
+
+        $content = $this->language->parsePlaceholders($content);
+        $content = SefHelper::parsePlaceholders(
+            $content,
+            $this->view->getVar('currentId') ?? ''
+        );
+
+        /** @todo parse by event */
+        if ($parseSettings) :
+            $content = $this->setting->parsePlaceholders($content);
+        endif;
+
+        return $content;
+    }
+
     public function parseListeners(string $content, string $type): string
     {
         $eventVehicle = new EventVehicleHelper($this->view, $this->url);
@@ -50,34 +74,10 @@ class ContentService extends AbstractInjectableService
             $eventVehicle->set($key, $value);
         endforeach;
 
-        $this->eventsManager->fire($type.':apply', $eventVehicle);
+        $this->eventsManager->fire($type . ':apply', $eventVehicle);
         $this->eventInputs = [];
 
         return $eventVehicle->_('content');
-    }
-
-    public function parseContent(
-        string $content,
-        bool $parseTags = true,
-        bool $parseSettings = true
-    ): string
-    {
-        if ($parseTags) :
-            $content = $this->parseListeners($content,'contentTag');
-        endif;
-
-        $content = $this->language->parsePlaceholders($content);
-        $content = SefHelper::parsePlaceholders(
-            $content,
-            $this->view->getVar('currentId')??''
-        );
-
-        /** @todo parse by event */
-        if($parseSettings) :
-            $content = $this->setting->parsePlaceholders($content);
-        endif;
-
-        return $content;
     }
 
     public function addEventInput(string $key, $value): ContentService

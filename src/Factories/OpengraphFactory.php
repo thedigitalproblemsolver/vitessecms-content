@@ -13,7 +13,8 @@ class OpengraphFactory
         Item $item,
         SettingService $setting,
         ConfigService $config
-    ): OpenGraph {
+    ): OpenGraph
+    {
         try {
             $opengraph = new OpenGraph();
             $opengraph->title($item->_('name'));
@@ -24,16 +25,16 @@ class OpengraphFactory
                 $opengraph->attributes(
                     'product',
                     [
-                        'price:amount'   => $item->_('price_sale'),
+                        'price:amount' => $item->_('price_sale'),
                         'price:currency' => $setting->get('SHOP_CURRENCY_ISO'),
-                        'availability'   => 'instock',
+                        'availability' => 'instock',
                     ]
                 );
             endif;
 
             if ($item->_('image')) :
                 $opengraph->image(
-                    $config->getUploadUri().$item->_('image')
+                    $config->getUploadUri() . $item->_('image')
                 );
             endif;
 

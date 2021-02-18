@@ -27,7 +27,8 @@ class AdminitemController extends AbstractAdminController implements AdminReposi
         string $template = 'editForm',
         string $templatePath = 'core/src/Resources/views/admin/',
         AbstractForm $form = null
-    ): void {
+    ): void
+    {
         if ($itemId === null) :
             $this->classForm = NewItemForm::class;
         endif;
