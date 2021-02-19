@@ -20,12 +20,12 @@ class TagItemListener extends AbstractTagListener
         $tagOptions = explode(';', $tagString);
         $replace = '';
 
-        if(!empty($tagOptions[1])) :
-            foreach (explode(',',$tagOptions[1]) as $options) :
-                if(MongoUtil::isObjectId($options)) :
+        if (!empty($tagOptions[1])) :
+            foreach (explode(',', $tagOptions[1]) as $options) :
+                if (MongoUtil::isObjectId($options)) :
                     /** @var Item $item */
                     $item = Item::findById($options);
-                    if($item instanceof Item) :
+                    if ($item instanceof Item) :
                         $replace .= $this->renderItem(
                             $item,
                             $tagOptions[2],
@@ -33,26 +33,26 @@ class TagItemListener extends AbstractTagListener
                         );
                     endif;
                 else :
-                    $options = explode(':',$options);
+                    $options = explode(':', $options);
                     if ($options[0] === 'latest') :
                         Item::setFindLimit((int)$options[1]);
-                        Item::addFindOrder('createdAt',-1);
-                        Item::setFindValue('datagroup',$options[2]);
+                        Item::addFindOrder('createdAt', -1);
+                        Item::setFindValue('datagroup', $options[2]);
                         $items = Item::findAll();
 
                         $cells = 0;
-                        if(isset($options[3])) :
+                        if (isset($options[3])) :
                             $cells = (int)$options[3];
                         endif;
 
                         $cellCounter = 0;
-                        if($items) :
-                            if(!empty($cells)) :
+                        if ($items) :
+                            if (!empty($cells)) :
                                 $replace .= '<table width="100%" border="0" cellpadding="5"><tr>';
                             endif;
                             foreach ($items as $item) :
-                                if(!empty($cells)) :
-                                    if($cellCounter > 1 && is_int($cellCounter/$cells)) :
+                                if (!empty($cells)) :
+                                    if ($cellCounter > 1 && is_int($cellCounter / $cells)) :
                                         $replace .= '</tr><tr>';
                                     endif;
                                     $cellCounter++;
@@ -63,12 +63,12 @@ class TagItemListener extends AbstractTagListener
                                     $tagOptions[2],
                                     $contentVehicle->getView()
                                 );
-                                if(!empty($cells)) :
+                                if (!empty($cells)) :
                                     $replace .= '<br/><br/></td>';
                                 endif;
                             endforeach;
-                            if(!empty($cells)) :
-                                if(!is_int($cellCounter/$cells)) :
+                            if (!empty($cells)) :
+                                if (!is_int($cellCounter / $cells)) :
                                     $replace .= '</tr>';
                                 endif;
                                 $replace .= '</table>';
@@ -82,7 +82,7 @@ class TagItemListener extends AbstractTagListener
         $contentVehicle->set(
             'content',
             str_replace(
-                '{'.$this->name.$tagString.'}',
+                '{' . $this->name . $tagString . '}',
                 $replace,
                 $contentVehicle->_('content')
             )

@@ -14,16 +14,46 @@ class ItemRepository
         bool $hideUnpublished = true,
         ?int $limit = null,
         ?FindOrderIterator $findOrders = null
-    ): ItemIterator {
+    ): ItemIterator
+    {
         Item::setFindPublished($hideUnpublished);
         Item::addFindOrder('name');
-        if($limit !== null) :
+        if ($limit !== null) :
             Item::setFindLimit($limit);
         endif;
         $this->parseFindValues($findValues);
         $this->parseFindOrders($findOrders);
 
         return new ItemIterator(Item::findAll());
+    }
+
+    protected function parseFindValues(?FindValueIterator $findValues = null): void
+    {
+        if ($findValues !== null) :
+            while ($findValues->valid()) :
+                $findValue = $findValues->current();
+                Item::setFindValue(
+                    $findValue->getKey(),
+                    $findValue->getValue(),
+                    $findValue->getType()
+                );
+                $findValues->next();
+            endwhile;
+        endif;
+    }
+
+    protected function parseFindOrders(?FindOrderIterator $findOrders = null): void
+    {
+        if ($findOrders !== null) :
+            while ($findOrders->valid()) :
+                $findOrder = $findOrders->current();
+                Item::addFindOrder(
+                    $findOrder->getKey(),
+                    $findOrder->getOrder()
+                );
+                $findOrders->next();
+            endwhile;
+        endif;
     }
 
     public function getById(string $id, bool $hideUnpublished = true, $renderFields = true): ?Item
@@ -56,7 +86,8 @@ class ItemRepository
     public function findFirst(
         ?FindValueIterator $findValues = null,
         bool $hideUnpublished = true
-    ): ?Item {
+    ): ?Item
+    {
         Item::setFindPublished($hideUnpublished);
         $this->parsefindValues($findValues);
 
@@ -69,39 +100,10 @@ class ItemRepository
         return null;
     }
 
-    protected function parseFindValues(?FindValueIterator $findValues = null): void
-    {
-        if ($findValues !== null) :
-            while ($findValues->valid()) :
-                $findValue = $findValues->current();
-                Item::setFindValue(
-                    $findValue->getKey(),
-                    $findValue->getValue(),
-                    $findValue->getType()
-                );
-                $findValues->next();
-            endwhile;
-        endif;
-    }
-
-    protected function parseFindOrders(?FindOrderIterator $findOrders = null): void
-    {
-        if ($findOrders !== null) :
-            while ($findOrders->valid()) :
-                $findOrder = $findOrders->current();
-                Item::addFindOrder(
-                    $findOrder->getKey(),
-                    $findOrder->getOrder()
-                );
-                $findOrders->next();
-            endwhile;
-        endif;
-    }
-
     public function findBySlug(string $slug, $languageShortCode): ?Item
     {
-        Item::setFindValue('slug.'.$languageShortCode, $slug);
-        Item::addFindOrder('createdAt',-1);
+        Item::setFindValue('slug.' . $languageShortCode, $slug);
+        Item::addFindOrder('createdAt', -1);
 
         /** @var Item $item */
         $item = Item::findFirst();

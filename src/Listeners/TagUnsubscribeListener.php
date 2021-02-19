@@ -16,14 +16,13 @@ class TagUnsubscribeListener extends AbstractTagListener
 
     protected function parse(EventVehicleHelper $eventVehicle, string $tagString): void
     {
-        $unsubscribeLink = $eventVehicle->getUrl()->getBaseUri().
-            'communication/newsletterqueue/unsubscribe/'.
-            $eventVehicle->_('newsletterQueueId')
-        ;
+        $unsubscribeLink = $eventVehicle->getUrl()->getBaseUri() .
+            'communication/newsletterqueue/unsubscribe/' .
+            $eventVehicle->_('newsletterQueueId');
 
         $content = str_replace(
-            ['{UNSUBSCRIBE}','{/UNSUBSCRIBE}'],
-            ['<a href="'.$unsubscribeLink.'" class="link-unsubscribe" style="text-decoration:none" target="_blank" >','</a>'],
+            ['{UNSUBSCRIBE}', '{/UNSUBSCRIBE}'],
+            ['<a href="' . $unsubscribeLink . '" class="link-unsubscribe" style="text-decoration:none" target="_blank" >', '</a>'],
             $eventVehicle->_('content')
         );
         $eventVehicle->set('content', $content);

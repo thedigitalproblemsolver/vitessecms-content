@@ -2,6 +2,7 @@
 
 namespace VitesseCms\Content\Helpers;
 ;
+
 use VitesseCms\Core\Interfaces\BaseObjectInterface;
 use VitesseCms\Core\Services\UrlService;
 use VitesseCms\Core\Services\ViewService;

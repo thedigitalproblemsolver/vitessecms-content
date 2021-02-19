@@ -18,12 +18,12 @@ class NewItemForm extends AbstractFormWithRepository
 
     public function buildForm(): FormWithRepositoryInterface
     {
-        $parentId =$this->request->get('parentId', null);
+        $parentId = $this->request->get('parentId', null);
         if (!empty($parentId)) :
             $parent = $this->repositories->item->getById($parentId, false);
             $datagroups = $this->repositories->datagroup->findAllByParentId($parent->getDatagroup());
         else :
-            $datagroups = $this->repositories->datagroup->findAll(null,false);
+            $datagroups = $this->repositories->datagroup->findAll(null, false);
         endif;
 
         $this->addDropdown(
@@ -32,11 +32,10 @@ class NewItemForm extends AbstractFormWithRepository
             (new Attributes())
                 ->setRequired()
                 ->setOptions(ElementHelper::modelIteratorToOptions($datagroups))
-            )
+        )
             ->addHidden('parentId', $parentId)
             ->addAcl('%ADMIN_PERMISSION_ROLES%', 'roles')
-            ->addSubmitButton('%CORE_SAVE%')
-        ;
+            ->addSubmitButton('%CORE_SAVE%');
 
         return $this;
     }

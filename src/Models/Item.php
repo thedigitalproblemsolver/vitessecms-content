@@ -14,49 +14,34 @@ class Item extends AbstractCollection
      * @var bool
      */
     protected static $renderFields = true;
-
-    /**
-     * @var bool
-     */
-    protected $isFilterable = false;
-
     /**
      * @var array
      */
     public $slug;
-
     /**
      * @var bool
      */
     public $homepage;
-
     /**
      * @var string
      */
     public $datagroup;
-
     /**
      * @var string
      */
     public $parentId;
-
     /**
      * @var array
      */
     public $seoTitle;
-
     /**
      * @var int
      */
     public $ordering;
-
     /**
-     * @return string
+     * @var bool
      */
-    public function __toString(): string
-    {
-        return (string)$this->_('name');
-    }
+    protected $isFilterable = false;
 
     /**
      * {@inheritdoc}
@@ -85,9 +70,17 @@ class Item extends AbstractCollection
     /**
      * @param bool $renderFields
      */
-    public static function setRenderFields(Bool $renderFields)
+    public static function setRenderFields(bool $renderFields)
     {
         self::$renderFields = $renderFields;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return (string)$this->_('name');
     }
 
     /**
@@ -128,6 +121,13 @@ class Item extends AbstractCollection
         return $this->datagroup;
     }
 
+    public function setDatagroup(string $datagroup): Item
+    {
+        $this->datagroup = $datagroup;
+
+        return $this;
+    }
+
     public function setIsFilterable(bool $isFilterable): Item
     {
         $this->isFilterable = $isFilterable;
@@ -140,6 +140,11 @@ class Item extends AbstractCollection
         return $this->parentId;
     }
 
+    public function getOrdering(): int
+    {
+        return (int)$this->ordering;
+    }
+
     public function setOrdering($ordering): Item
     {
         $this->ordering = (int)$ordering;
@@ -147,21 +152,9 @@ class Item extends AbstractCollection
         return $this;
     }
 
-    public function getOrdering(): int
-    {
-        return (int)$this->ordering;
-    }
-
     public function setSeoTitle(array $seoTitle): Item
     {
         $this->seoTitle = $seoTitle;
-
-        return $this;
-    }
-
-    public function setDatagroup(string $datagroup): Item
-    {
-        $this->datagroup = $datagroup;
 
         return $this;
     }
