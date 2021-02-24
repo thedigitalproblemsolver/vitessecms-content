@@ -33,7 +33,7 @@ class AdminItemControllerListener
     {
         if (!$item->isDeleted()) :
             $item = $this->setSeoTitle($item);
-            $item = $this->setSlugs($item);
+            $item = $this->setSlugs($item, $controller);
             $this->clearCache($item, $controller->cache);
         endif;
     }
@@ -109,7 +109,7 @@ class AdminItemControllerListener
         return $item;
     }
 
-    protected function setSlugs(Item $item): Item
+    protected function setSlugs(Item $item, AdminitemController $controller): Item
     {
         $datagroupRepository = new DatagroupRepository();
         $datafieldRepository = new DatafieldRepository();
@@ -121,9 +121,7 @@ class AdminItemControllerListener
         foreach ($datagroup->getDatafields() as $datafieldArray) :
             $datafield = $datafieldRepository->getById($datafieldArray['id']);
             if (is_object($datafield)) :
-                $static = $datafield->getClass();
-                /** @var AbstractField $static */
-                $static::beforeSave($item, $datafield);
+                $controller->eventsManager->fire($datafield->getClass() . ':beforeSave', $item, $datafield);
             endif;
         endforeach;
 
