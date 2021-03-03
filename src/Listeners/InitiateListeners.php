@@ -9,7 +9,6 @@ class InitiateListeners
 {
     public static function setListeners(Manager $eventsManager): void
     {
-        $eventsManager->attach(Item::class, new ModelItemListener());
         $eventsManager->attach('adminMenu', new AdminMenuListener());
     }
 }

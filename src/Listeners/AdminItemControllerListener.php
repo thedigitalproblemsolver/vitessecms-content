@@ -14,6 +14,8 @@ use VitesseCms\Core\Interfaces\BaseObjectInterface;
 use VitesseCms\Core\Interfaces\InjectableInterface;
 use VitesseCms\Core\Services\CacheService;
 use VitesseCms\Database\AbstractCollection;
+use VitesseCms\Database\Models\FindValue;
+use VitesseCms\Database\Models\FindValueIterator;
 use VitesseCms\Database\Utils\MongoUtil;
 use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Datafield\Repositories\DatafieldRepository;
@@ -32,28 +34,27 @@ class AdminItemControllerListener
     public function beforeModelSave(Event $event, AdminitemController $controller, Item $item): void
     {
         if (!$item->isDeleted()) :
-            $item = $this->setSeoTitle($item);
-            $item = $this->setSlugs($item);
+            $item = $this->setSeoTitle($item, $controller);
+            $item = $this->setSlugs($item, $controller);
             $this->clearCache($item, $controller->cache);
         endif;
     }
 
-    protected function setSeoTitle(Item $item): Item
+    protected function setSeoTitle(Item $item, AdminitemController $controller): Item
     {
-        Datagroup::setFindPublished(false);
-        /** @var Datagroup $datagroup */
-        $datagroup = Datagroup::findById($item->getDatagroup());
+        $datagroup = $controller->repositories->datagroup->getById($item->getDatagroup(), false);
 
         $slugCategories = [];
-        $slugDatagroups = array_reverse($datagroup->getSeoTitleCategories());
-        /** @var Item $previousItem */
+        $seoTitleCategories = array_reverse($datagroup->getSeoTitleCategories());
+
         $previousItem = clone $item;
-        foreach ($slugDatagroups as $datagroupObject) :
+        foreach ($seoTitleCategories as $datagroupObject) :
             if (is_array($datagroupObject) && $previousItem) :
-                Item::setFindPublished(false);
                 if ($datagroupObject['published'] && $previousItem->getParentId() !== null):
-                    $previousItem = Item::findById($previousItem->getParentId());
-                    $slugCategories[] = $previousItem;
+                    $slugCategories[] = $controller->repositories->item->getById(
+                        $previousItem->getParentId(),
+                        false
+                    );
                 endif;
             endif;
         endforeach;
@@ -61,21 +62,22 @@ class AdminItemControllerListener
         $slugDatafields = [];
         foreach ($datagroup->getSeoTitleDatafields() as $datafieldObject) :
             if (is_array($datafieldObject) && $datafieldObject['published']) :
-                $slugDatafields[] = Datafield::findById($datafieldObject['id']);
+                $slugDatafields[] = $controller->repositories->datafield->getById(
+                    $datafieldObject['id'],
+                    false
+                );
             endif;
         endforeach;
 
         $seoTitle = [];
-        Language::setFindPublished(false);
-        $languages = Language::findAll();
-        /** @var Language $language */
-        foreach ($languages as $language) :
+        $languages = $controller->repositories->language->findAll(null, false);
+        while ($languages->valid()) :
+            $language = $languages->current();
             if (!isset($seoTitle[$language->getShortCode()])) :
                 $seoTitle[$language->getShortCode()] = '';
             endif;
 
             $slugParts = [];
-            /** @var Datafield $datafield */
             foreach ($slugDatafields as $datafield) :
                 $datafieldResult = $item->_($datafield->getCallingName(), $language->getShortCode());
                 if (!empty($datafieldResult)) :
@@ -84,9 +86,9 @@ class AdminItemControllerListener
                     elseif (is_array($datafieldResult)) :
                         foreach ($datafieldResult as $result) :
                             if (MongoUtil::isObjectId($result)) :
-                                $resultItem = Item::findById($result);
+                                $resultItem = $controller->repositories->item->getById($result);
                                 if ($resultItem !== null) :
-                                    $slugParts[] = $resultItem->_('name');
+                                    $slugParts[] = $resultItem->getNameField();
                                 endif;
                             endif;
                         endforeach;
@@ -97,33 +99,32 @@ class AdminItemControllerListener
             if (count($slugCategories) > 0):
                 /** @var AbstractCollection $slugCategory */
                 foreach ($slugCategories as $slugCategory) :
-                    $slugParts[] = $slugCategory->_('name', $language->getShortCode());
+                    $slugParts[] = $slugCategory->getNameField($language->getShortCode());
                 endforeach;
             endif;
 
             $seoTitle[$language->getShortCode()] = implode(' ', $slugParts);
-        endforeach;
+            $languages->next();
+        endwhile;
 
         $item->setSeoTitle($seoTitle);
 
         return $item;
     }
 
-    protected function setSlugs(Item $item): Item
+    protected function setSlugs(Item $item, AdminitemController $controller): Item
     {
-        $datagroupRepository = new DatagroupRepository();
-        $datafieldRepository = new DatafieldRepository();
-        $itemRepository = new ItemRepository();
-        $languageRepository = new LanguageRepository();
+        $datagroupRepository = $controller->repositories->datagroup;
+        $datafieldRepository = $controller->repositories->datafield;
+        $itemRepository = $controller->repositories->item;
+        $languageRepository = $controller->repositories->language;
 
         $datagroup = $datagroupRepository->getById($item->getDatagroup(), false);
         $item->setIsFilterable($datagroup->hasFilterableFields());
         foreach ($datagroup->getDatafields() as $datafieldArray) :
             $datafield = $datafieldRepository->getById($datafieldArray['id']);
             if (is_object($datafield)) :
-                $static = $datafield->getClass();
-                /** @var AbstractField $static */
-                $static::beforeSave($item, $datafield);
+                $controller->eventsManager->fire($datafield->getClass() . ':beforeSave', $item, $datafield);
             endif;
         endforeach;
 
@@ -196,19 +197,21 @@ class AdminItemControllerListener
         endforeach;
     }
 
-    public function adminListFilter(Event $event, AbstractAdminController $controller, AdminlistFormInterface $form): string
+    public function adminListFilter(Event $event, AdminitemController $controller, AdminlistFormInterface $form): string
     {
         $form->addHidden('filter[datagroup]');
 
         $request = new Request();
         if (isset($request->get('filter')['datagroup'])) :
-            $mainDatagroup = Datagroup::findById($request->get('filter')['datagroup']);
+            $mainDatagroup = $controller->repositories->datagroup->getById(
+                $request->get('filter')['datagroup']
+            );
             $datagroups = DatagroupHelper::getChildrenFromRoot($mainDatagroup);
             /** @var Datagroup $datagroup */
             foreach ($datagroups as $datagroup) :
                 foreach ($datagroup->getDatafields() as $datafield) :
                     if ($datafield['published']) :
-                        $datafield = Datafield::findById($datafield['id']);
+                        $datafield = $controller->repositories->datafield->getById($datafield['id']);
                         if ($datafield && $datafield->isPublished()) :
                             $datafield->renderAdminlistFilter($form);
                         endif;
@@ -220,7 +223,12 @@ class AdminItemControllerListener
                 'Has as parent',
                 'filter[parentId]',
                 (new Attributes())->setOptions(
-                    ElementHelper::arrayToSelectOptions($this->getParentOptionsFromDatagroup($mainDatagroup))
+                    ElementHelper::arrayToSelectOptions(
+                        $this->getParentOptionsFromDatagroup(
+                            $mainDatagroup,
+                            $controller
+                        )
+                    )
                 )
             );
 
@@ -234,14 +242,23 @@ class AdminItemControllerListener
         );
     }
 
-    protected function getParentOptionsFromDatagroup(Datagroup $datagroup, array $parentOptions = []): array
+    protected function getParentOptionsFromDatagroup(
+        Datagroup $datagroup,
+        AdminitemController $controller,
+        array $parentOptions = []
+    ): array
     {
-        Item::setFindValue('datagroup', (string)$datagroup->getId());
-        $items = Item::findAll();
+        $items = $controller->repositories->item->findAll(
+            new FindValueIterator([new FindValue('datagroup', (string)$datagroup->getId())])
+        );
         foreach ($items as $item) :
             if ($item->hasChildren()):
                 $parentOptions[(string)$item->getId()] = $item->_('name');
-                $this->getParentOptionsFromItem($item, $parentOptions);
+                $this->getParentOptionsFromItem(
+                    $item,
+                    $controller,
+                    $parentOptions
+                );
             endif;
         endforeach;
 
@@ -250,17 +267,23 @@ class AdminItemControllerListener
 
     protected function getParentOptionsFromItem(
         AbstractCollection $parent,
+        AdminitemController $controller,
         array &$parentOptions = [],
         array $prefix = []
-    ): void
-    {
-        Item::setFindValue('parentId', (string)$parent->getId());
+    ): void {
+        $items = $controller->repositories->item->findAll(
+            new FindValueIterator([new FindValue('parentId', (string)$parent->getId())])
+        );
         $prefix[] = $parent->_('name');
-        $items = Item::findAll();
         foreach ($items as $item) :
             if ($item->hasChildren()):
                 $parentOptions[(string)$item->getId()] = implode(' > ', $prefix) . ' > ' . $item->_('name');
-                $this->getParentOptionsFromItem($item, $parentOptions, $prefix);
+                $this->getParentOptionsFromItem(
+                    $item,
+                    $controller,
+                    $parentOptions,
+                    $prefix
+                );
             endif;
         endforeach;
     }
