@@ -10,7 +10,7 @@ use VitesseCms\Database\Utils\MongoUtil;
 use VitesseCms\Shop\Enum\DiscountEnum;
 use VitesseCms\Shop\Factories\DiscountFactory;
 use VitesseCms\Shop\Models\Discount;
-use \DateTime;
+use DateTime;
 
 /**
  * @deprecated move to shop

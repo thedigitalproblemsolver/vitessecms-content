@@ -2,7 +2,9 @@
 
 namespace VitesseCms\Content\Models;
 
-class ItemIterator extends \ArrayIterator
+use ArrayIterator;
+
+class ItemIterator extends ArrayIterator
 {
     public function __construct(array $products)
     {

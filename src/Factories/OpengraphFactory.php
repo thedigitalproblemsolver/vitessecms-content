@@ -3,6 +3,7 @@
 namespace VitesseCms\Content\Factories;
 
 use ChrisKonnertz\OpenGraph\OpenGraph;
+use Exception;
 use VitesseCms\Content\Models\Item;
 use VitesseCms\Configuration\Services\ConfigService;
 use VitesseCms\Setting\Services\SettingService;
@@ -49,7 +50,7 @@ class OpengraphFactory
             $opengraph->url($item->_('slug'));
 
             return $opengraph;
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             echo $exception->getMessage();
             die();
         }

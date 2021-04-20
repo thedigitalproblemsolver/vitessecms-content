@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 namespace VitesseCms\Content\Helpers;
-;
 
 use VitesseCms\Core\Interfaces\BaseObjectInterface;
 use VitesseCms\Core\Services\UrlService;

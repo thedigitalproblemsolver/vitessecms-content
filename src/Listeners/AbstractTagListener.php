@@ -4,6 +4,7 @@ namespace VitesseCms\Content\Listeners;
 
 use VitesseCms\Content\Helpers\EventVehicleHelper;
 use Phalcon\Events\Event;
+use function is_array;
 
 abstract class AbstractTagListener
 {
@@ -13,7 +14,7 @@ abstract class AbstractTagListener
     {
         if ($this->hasTag($contentVehicle->_('content'))) :
             $tagsFromBody = $this->getTagsFromBody($contentVehicle->_('content'));
-            if (\is_array($tagsFromBody) && isset($tagsFromBody[1]) && \is_array($tagsFromBody[1])) :
+            if (is_array($tagsFromBody) && isset($tagsFromBody[1]) && is_array($tagsFromBody[1])) :
                 foreach ($tagsFromBody[1] as $tagString) :
                     $this->parse($contentVehicle, $tagString);
                 endforeach;
