@@ -35,7 +35,8 @@ class Module extends AbstractModule
             ));
         else :
             $di->setShared('repositories', new RepositoryCollection(
-                new ItemRepository()
+                new ItemRepository(),
+                new DatagroupRepository()
             ));
         endif;
     }
