@@ -6,6 +6,7 @@ use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 
 /**
  * @property ItemRepository $item
+ * @property DatagroupRepository $datagroup
  */
 interface RepositoryInterface
 {
