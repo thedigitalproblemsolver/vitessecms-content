@@ -124,7 +124,7 @@ class AdminItemControllerListener
         foreach ($datagroup->getDatafields() as $datafieldArray) :
             $datafield = $datafieldRepository->getById($datafieldArray['id']);
             if (is_object($datafield)) :
-                $controller->eventsManager->fire($datafield->getClass() . ':beforeSave', $item, $datafield);
+                $controller->eventsManager->fire($datafield->getFieldType() . ':beforeSave', $item, $datafield);
             endif;
         endforeach;
 
