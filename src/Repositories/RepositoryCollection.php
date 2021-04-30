@@ -12,8 +12,17 @@ class RepositoryCollection
      */
     public $item;
 
-    public function __construct(ItemRepository $itemRepository)
+    /**
+     * @var DatagroupRepository
+     */
+    public $datagroup;
+
+    public function __construct(
+        ItemRepository $itemRepository,
+        DatagroupRepository $datagroupRepository
+    )
     {
         $this->item = $itemRepository;
+        $this->datagroup = $datagroupRepository;
     }
 }
