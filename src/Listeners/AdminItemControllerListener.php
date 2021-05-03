@@ -4,30 +4,19 @@ namespace VitesseCms\Content\Listeners;
 
 use Phalcon\Events\Event;
 use Phalcon\Http\Request;
-use Phalcon\Utils\Slug;
-use VitesseCms\Admin\AbstractAdminController;
 use VitesseCms\Admin\Forms\AdminlistFormInterface;
 use VitesseCms\Content\Controllers\AdminitemController;
 use VitesseCms\Content\Models\Item;
-use VitesseCms\Content\Repositories\ItemRepository;
-use VitesseCms\Core\Interfaces\BaseObjectInterface;
-use VitesseCms\Core\Interfaces\InjectableInterface;
+use VitesseCms\Content\Utils\SeoUtil;
 use VitesseCms\Core\Services\CacheService;
 use VitesseCms\Database\AbstractCollection;
 use VitesseCms\Database\Models\FindValue;
 use VitesseCms\Database\Models\FindValueIterator;
 use VitesseCms\Database\Utils\MongoUtil;
-use VitesseCms\Datafield\Models\Datafield;
-use VitesseCms\Datafield\Repositories\DatafieldRepository;
 use VitesseCms\Datagroup\Helpers\DatagroupHelper;
 use VitesseCms\Datagroup\Models\Datagroup;
-use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Form\Helpers\ElementHelper;
-use VitesseCms\Form\Interfaces\AbstractFormInterface;
 use VitesseCms\Form\Models\Attributes;
-use VitesseCms\Language\Models\Language;
-use VitesseCms\Language\Repositories\LanguageRepository;
-use VitesseCms\Sef\Helpers\SefHelper;
 
 class AdminItemControllerListener
 {
@@ -35,7 +24,14 @@ class AdminItemControllerListener
     {
         if (!$item->isDeleted()) :
             $item = $this->setSeoTitle($item, $controller);
-            $item = $this->setSlugs($item, $controller);
+            $item = SeoUtil::setSlugsOnItem(
+                $item,
+                $controller->repositories->datagroup,
+                $controller->repositories->datafield,
+                $controller->repositories->item,
+                $controller->repositories->language,
+                $controller->eventsManager
+            );
             $this->clearCache($item, $controller->cache);
         endif;
     }
@@ -108,84 +104,6 @@ class AdminItemControllerListener
         endwhile;
 
         $item->setSeoTitle($seoTitle);
-
-        return $item;
-    }
-
-    protected function setSlugs(Item $item, AdminitemController $controller): Item
-    {
-        $datagroupRepository = $controller->repositories->datagroup;
-        $datafieldRepository = $controller->repositories->datafield;
-        $itemRepository = $controller->repositories->item;
-        $languageRepository = $controller->repositories->language;
-
-        $datagroup = $datagroupRepository->getById($item->getDatagroup(), false);
-        $item->setIsFilterable($datagroup->hasFilterableFields());
-        foreach ($datagroup->getDatafields() as $datafieldArray) :
-            $datafield = $datafieldRepository->getById($datafieldArray['id']);
-            if (is_object($datafield)) :
-                $controller->eventsManager->fire($datafield->getFieldType() . ':beforeSave', $item, $datafield);
-            endif;
-        endforeach;
-
-        $slugCategories = [];
-        $slugDatagroups = array_reverse($datagroup->getSlugCategories());
-        /** @var Item $previousItem */
-        $previousItem = clone $item;
-        foreach ($slugDatagroups as $datagroupArray) :
-            if (is_array($datagroupArray) && $previousItem) :
-                if ($datagroupArray['published'] && $previousItem->getParentId() !== null):
-                    $slugCategories[] = $itemRepository->getById($previousItem->getParentId(), false);
-                endif;
-            endif;
-        endforeach;
-        $slugCategories = array_reverse($slugCategories);
-
-        $slugDatafields = [];
-        foreach ($datagroup->getSlugDatafields() as $datafieldArray) :
-            if ($datafieldArray['published']) :
-                $slugDatafields[] = $datafieldRepository->getById($datafieldArray['id']);
-            endif;
-        endforeach;
-
-        $slugs = [];
-        $languages = $languageRepository->findAll(null, false);
-        while ($languages->valid()) :
-            $language = $languages->current();
-            if (!isset($slugs[$language->getShortCode()])) :
-                $slugs[$language->getShortCode()] = '';
-            endif;
-
-            $slugParts = [];
-            if (count($slugCategories) > 0):
-                /** @var AbstractCollection $slugCategory */
-                foreach ($slugCategories as $slugCategory) :
-                    $slugParts[] = Slug::generate($slugCategory->_('name', $language->getShortCode()));
-                endforeach;
-                $slugs[$language->getShortCode()] = implode($datagroup->getSlugDelimiter(), $slugParts);
-                if (substr_count($slugs[$language->getShortCode()], 'page:') === 0) :
-                    $slugs[$language->getShortCode()] .= '/';
-                endif;
-            endif;
-
-            $slugParts = [];
-            /** @var Datafield $datafield */
-            foreach ($slugDatafields as $datafield) :
-                $datafieldResult = $datafield->getSlugPart($item, $language->getShortCode());
-                if (!empty($datafieldResult)) :
-                    $slugParts[] = $datafieldResult;
-                endif;
-            endforeach;
-
-            $slugs[$language->getShortCode()] .= implode($datagroup->getSlugDelimiter(), $slugParts);
-            if (substr_count($slugs[$language->getShortCode()], 'page:') === 0) :
-                $slugs[$language->getShortCode()] .= '/';
-            endif;
-            $languages->next();
-        endwhile;
-
-        $item->setSlugs($slugs);
-        SefHelper::saveRedirectFromItem((string)$item->getId(), $slugs);
 
         return $item;
     }
