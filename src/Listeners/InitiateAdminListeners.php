@@ -3,6 +3,7 @@
 namespace VitesseCms\Content\Listeners;
 
 use VitesseCms\Content\Blocks\Filter;
+use VitesseCms\Content\Blocks\FilterResult;
 use VitesseCms\Content\Blocks\MainContent;
 use VitesseCms\Content\Controllers\AdminitemController;
 use Phalcon\Events\Manager;
@@ -15,5 +16,6 @@ class InitiateAdminListeners
         $eventsManager->attach(AdminitemController::class, new AdminItemControllerListener());
         $eventsManager->attach(MainContent::class, new BlockMainContentListener());
         $eventsManager->attach(Filter::class, new BlockFilterListener());
+        $eventsManager->attach(FilterResult::class, new BlockFilterResultListener());
     }
 }
