@@ -2,7 +2,7 @@
 
 namespace VitesseCms\Content\Listeners;
 
-use VitesseCms\Block\Models\MainContent;
+use VitesseCms\Content\Blocks\MainContent;
 use VitesseCms\Content\Controllers\AdminitemController;
 use Phalcon\Events\Manager;
 
