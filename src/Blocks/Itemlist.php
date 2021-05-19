@@ -183,32 +183,6 @@ class Itemlist extends AbstractBlockModel
         endif;
     }
 
-    public function buildBlockForm(BlockForm $form, Block $item, RepositoryInterface $repositories): void
-    {
-        parent::buildBlockForm($form, $item, $repositories);
-
-        switch ($item->_('listMode')) :
-            case ItemListEnum::LISTMODE_HANDPICKED:
-                BlockItemlistHandpickedSubForm::getBlockForm($form, $item, $this->di->repositories);
-                break;
-            case ItemListEnum::LISTMODE_CHILDREN_OF_ITEM:
-                BlockItemlistChildrenOfItemSubForm::getBlockForm($form, $item, $this->di->repositories);
-                break;
-            case ItemListEnum::LISTMODE_DATAGROUPS:
-                BlockItemlistDatagroupSubForm::getBlockForm($form, $item, $this->di->repositories);
-                break;
-        endswitch;
-
-        if (
-            substr_count($item->getTemplate(), 'card_two_columns')
-            || substr_count($item->getTemplate(), 'card_three_columns')
-            || substr_count($item->getTemplate(), 'card_four_columns')
-        ):
-            $form->addToggle('Image fullwidth', 'imageFullWidth')
-                ->addToggle('Hide intro text', 'hideIntroText');
-        endif;
-    }
-
     public function loadAssets(Block $block): void
     {
         parent::loadAssets($block);
