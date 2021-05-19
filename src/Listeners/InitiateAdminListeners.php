@@ -2,6 +2,7 @@
 
 namespace VitesseCms\Content\Listeners;
 
+use VitesseCms\Block\Models\Texteditor;
 use VitesseCms\Content\Blocks\Filter;
 use VitesseCms\Content\Blocks\FilterResult;
 use VitesseCms\Content\Blocks\MainContent;
@@ -17,5 +18,6 @@ class InitiateAdminListeners
         $eventsManager->attach(MainContent::class, new BlockMainContentListener());
         $eventsManager->attach(Filter::class, new BlockFilterListener());
         $eventsManager->attach(FilterResult::class, new BlockFilterResultListener());
+        $eventsManager->attach(Texteditor::class, new BlockTexteditorListener());
     }
 }
