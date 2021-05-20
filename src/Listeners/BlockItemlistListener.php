@@ -98,4 +98,16 @@ class BlockItemlistListener
                 ->addToggle('Hide intro text', 'hideIntroText');
         endif;
     }
+
+    public function loadAssets(Event $event, Block $block): void
+    {
+        if (
+            substr_count($block->getTemplate(), 'address_list')
+            && $block->getDi()->get('setting')->has('GOOGLE_MAPS_APIKEY')
+        ) :
+            $block->getDI()->get('assets')->loadGoogleMaps(
+                $block->getDi()->get('setting')->get('GOOGLE_MAPS_APIKEY')
+            );
+        endif;
+    }
 }

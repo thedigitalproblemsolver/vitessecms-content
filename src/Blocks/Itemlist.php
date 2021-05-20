@@ -182,13 +182,4 @@ class Itemlist extends AbstractBlockModel
             $block->set('readmoreItem', $item);
         endif;
     }
-
-    public function loadAssets(Block $block): void
-    {
-        parent::loadAssets($block);
-
-        if (substr_count($block->getTemplate(), 'address_list')) :
-            $this->di->assets->loadGoogleMaps($this->di->setting->get('GOOGLE_MAPS_APIKEY'));
-        endif;
-    }
 }
