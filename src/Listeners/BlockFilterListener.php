@@ -43,4 +43,10 @@ class BlockFilterListener
                 ->setInputClass('select2')
         )->addToggle('Use label placeholders', 'labelAsPlaceholder');
     }
+
+    public function loadAssets(Event $event, Block $block): void
+    {
+        $block->getDI()->get('assets')->loadFilter();
+        $block->getDI()->get('assets')->loadSelect2();
+    }
 }

@@ -66,12 +66,4 @@ class Filter extends AbstractBlockModel
         $item = Item::findById($block->_('targetPage'));
         $block->set('filter', $filter->renderForm($item->getSlug(), 'filter'));
     }
-
-    public function loadAssets(Block $block): void
-    {
-        parent::loadAssets($block);
-
-        $this->di->assets->load(AssetsEnum::FILTER);
-        $this->di->assets->load(AssetsEnum::SELECT2);
-    }
 }
