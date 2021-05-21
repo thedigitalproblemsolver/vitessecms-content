@@ -5,6 +5,7 @@ namespace VitesseCms\Content\Listeners;
 use Phalcon\Events\Event;
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Models\Block;
+use VitesseCms\Content\Blocks\Itemlist;
 use VitesseCms\Content\Enum\ItemListEnum;
 use VitesseCms\Content\Forms\BlockItemlistChildrenOfItemSubForm;
 use VitesseCms\Content\Forms\BlockItemlistDatagroupSubForm;
@@ -99,7 +100,7 @@ class BlockItemlistListener
         endif;
     }
 
-    public function loadAssets(Event $event, Block $block): void
+    public function loadAssets(Event $event, Itemlist $itemlist, Block $block): void
     {
         if (
             substr_count($block->getTemplate(), 'address_list')

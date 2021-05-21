@@ -6,6 +6,7 @@ use Phalcon\Events\Event;
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Interfaces\RepositoryInterface;
 use VitesseCms\Block\Models\Block;
+use VitesseCms\Content\Blocks\Filter;
 use VitesseCms\Database\Models\FindValue;
 use VitesseCms\Database\Models\FindValueIterator;
 use VitesseCms\Form\Helpers\ElementHelper;
@@ -44,7 +45,7 @@ class BlockFilterListener
         )->addToggle('Use label placeholders', 'labelAsPlaceholder');
     }
 
-    public function loadAssets(Event $event, Block $block): void
+    public function loadAssets(Event $event, Filter $filter, Block $block): void
     {
         $block->getDI()->get('assets')->loadFilter();
         $block->getDI()->get('assets')->loadSelect2();
