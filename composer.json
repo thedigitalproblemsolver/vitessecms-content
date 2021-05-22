@@ -19,13 +19,13 @@
   },
   "require": {
     "chriskonnertz/open-graph": "^1.0",
-    "vitessecms/language": "~0.0.2",
+    "vitessecms/language": "~0.1.0",
     "vitessecms/sef": "~0.0.4",
     "vitessecms/setting": "~0.0.10",
-    "vitessecms/core": "~0.0.20",
-    "vitessecms/form": "~0.0.10",
-    "vitessecms/datafield": "~0.0.10",
-    "vitessecms/datagroup": "~0.0.8",
+    "vitessecms/core": "~0.1.0",
+    "vitessecms/form": "~0.1.0",
+    "vitessecms/datafield": "~0.1.0",
+    "vitessecms/datagroup": "~0.1.0",
     "vitessecms/block": "~0.1.0",
     "vitessecms/communication": "~0.1.0"
   }
