@@ -9,7 +9,7 @@ use VitesseCms\Block\Models\Block;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
 
-class BlockItemlistDatagroupSubForm implements BlockSubFormInterface
+class BlockItemlistDatagroupSubForm extends AbstractBlockItemlistSubForm implements BlockSubFormInterface
 {
     public static function getBlockForm(BlockForm $form, Block $block, RepositoryInterface $repositories): void
     {
@@ -24,7 +24,7 @@ class BlockItemlistDatagroupSubForm implements BlockSubFormInterface
 
         if (is_array($block->_('items'))) :
             foreach ($block->_('items') as $datagroupId) :
-                BlockItemlistSubForm::buildDatafieldValueForm($form, $datagroupId, $repositories);
+                self::buildDatafieldValueForm($form, $datagroupId, $repositories);
             endforeach;
             $form->addText('parentId', 'datafieldValue[parentId]');
         endif;

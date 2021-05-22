@@ -3,13 +3,8 @@
 namespace VitesseCms\Content\Blocks;
 
 use VitesseCms\Block\AbstractBlockModel;
-use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Content\Enum\ItemListEnum;
-use VitesseCms\Content\Forms\BlockItemlistDatagroupSubForm;
-use VitesseCms\Content\Forms\BlockItemlistHandpickedSubForm;
-use VitesseCms\Block\Interfaces\RepositoryInterface;
 use VitesseCms\Block\Models\Block;
-use VitesseCms\Content\Forms\BlockItemlistChildrenOfItemSubForm;
 use VitesseCms\Content\Models\Item;
 use VitesseCms\Core\Helpers\ItemHelper;
 use VitesseCms\Database\Utils\MongoUtil;
@@ -180,41 +175,6 @@ class Itemlist extends AbstractBlockModel
         if ($block->_('readmoreItem')) :
             $item = Item::findById($block->_('readmoreItem'));
             $block->set('readmoreItem', $item);
-        endif;
-    }
-
-    public function buildBlockForm(BlockForm $form, Block $item, RepositoryInterface $repositories): void
-    {
-        parent::buildBlockForm($form, $item, $repositories);
-
-        switch ($item->_('listMode')) :
-            case ItemListEnum::LISTMODE_HANDPICKED:
-                BlockItemlistHandpickedSubForm::getBlockForm($form, $item, $this->di->repositories);
-                break;
-            case ItemListEnum::LISTMODE_CHILDREN_OF_ITEM:
-                BlockItemlistChildrenOfItemSubForm::getBlockForm($form, $item, $this->di->repositories);
-                break;
-            case ItemListEnum::LISTMODE_DATAGROUPS:
-                BlockItemlistDatagroupSubForm::getBlockForm($form, $item, $this->di->repositories);
-                break;
-        endswitch;
-
-        if (
-            substr_count($item->getTemplate(), 'card_two_columns')
-            || substr_count($item->getTemplate(), 'card_three_columns')
-            || substr_count($item->getTemplate(), 'card_four_columns')
-        ):
-            $form->addToggle('Image fullwidth', 'imageFullWidth')
-                ->addToggle('Hide intro text', 'hideIntroText');
-        endif;
-    }
-
-    public function loadAssets(Block $block): void
-    {
-        parent::loadAssets($block);
-
-        if (substr_count($block->getTemplate(), 'address_list')) :
-            $this->di->assets->loadGoogleMaps($this->di->setting->get('GOOGLE_MAPS_APIKEY'));
         endif;
     }
 }

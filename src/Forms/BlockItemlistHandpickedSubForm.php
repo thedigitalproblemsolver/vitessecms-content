@@ -2,6 +2,7 @@
 
 namespace VitesseCms\Content\Forms;
 
+use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Interfaces\BlockSubFormInterface;
 use VitesseCms\Block\Interfaces\RepositoryInterface;
 use VitesseCms\Block\Models\Block;
