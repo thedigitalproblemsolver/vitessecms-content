@@ -5,14 +5,14 @@ namespace VitesseCms\Content\Forms;
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Interfaces\RepositoryInterface;
 use VitesseCms\Content\Enum\ItemListEnum;
+use VitesseCms\Content\Fields\Toggle;
 use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Database\Models\FindValue;
 use VitesseCms\Database\Models\FindValueIterator;
-use VitesseCms\Datafield\Models\FieldCheckbox;
-use VitesseCms\Datafield\Models\FieldDatagroup;
-use VitesseCms\Datafield\Models\FieldPrice;
+use VitesseCms\Datagroup\Fields\Datagroup;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
+use VitesseCms\Shop\Fields\ShopPrice;
 
 abstract class AbstractBlockItemlistSubForm
 {
@@ -27,9 +27,8 @@ abstract class AbstractBlockItemlistSubForm
                 if ($datafield !== null) :
                     $fieldName = 'datafieldValue[' . $datafield->getCallingName() . ']';
                     $name = $datafield->getNameField();
-                    switch ($datafield->getFieldType()):
-                        case 'FieldCheckbox':
-                        case FieldCheckbox::class:
+                    switch ($datafield->getType()):
+                        case Toggle::class:
                             $form->addDropdown(
                                 $name,
                                 $fieldName,
@@ -40,8 +39,7 @@ abstract class AbstractBlockItemlistSubForm
                                 ])
                                 ));
                             break;
-                        case 'FieldPrice':
-                        case FieldPrice::class:
+                        case ShopPrice::class:
                             $form->addDropdown(
                                 $name . ' discount',
                                 'datafieldValue[discount]',
@@ -52,8 +50,7 @@ abstract class AbstractBlockItemlistSubForm
                                 ])
                                 ));
                             break;
-                        case 'FieldDatagroup':
-                        case FieldDatagroup::class:
+                        case Datagroup::class:
                             $options = [];
                             if ($datafield->getDatagroup() !== null) {
                                 $items = $repositories->item->findAll(new FindValueIterator(
