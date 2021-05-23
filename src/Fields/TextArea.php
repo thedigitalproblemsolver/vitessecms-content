@@ -9,7 +9,7 @@ use VitesseCms\Form\AbstractForm;
 use VitesseCms\Form\Interfaces\AbstractFormInterface;
 use VitesseCms\Form\Models\Attributes;
 
-class Textarea extends AbstractField
+class TextArea extends AbstractField
 {
     public function buildItemFormElement(
         AbstractForm $form,
