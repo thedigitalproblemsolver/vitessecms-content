@@ -3,6 +3,7 @@
 namespace VitesseCms\Content\Listeners;
 
 use Phalcon\Events\Event;
+use Phalcon\Events\Manager;
 use Phalcon\Http\Request;
 use VitesseCms\Admin\Forms\AdminlistFormInterface;
 use VitesseCms\Content\Controllers\AdminitemController;
@@ -13,6 +14,7 @@ use VitesseCms\Database\AbstractCollection;
 use VitesseCms\Database\Models\FindValue;
 use VitesseCms\Database\Models\FindValueIterator;
 use VitesseCms\Database\Utils\MongoUtil;
+use VitesseCms\Datafield\Repositories\DatafieldRepository;
 use VitesseCms\Datagroup\Helpers\DatagroupHelper;
 use VitesseCms\Datagroup\Models\Datagroup;
 use VitesseCms\Form\Helpers\ElementHelper;
@@ -23,6 +25,9 @@ class AdminItemControllerListener
     public function beforeModelSave(Event $event, AdminitemController $controller, Item $item): void
     {
         if (!$item->isDeleted()) :
+            $datagroup = $controller->repositories->datagroup->getById($item->getDatagroup(), false);
+            $item->setIsFilterable($datagroup->hasFilterableFields());
+            $item = $this->parseDatafields($item, $datagroup, $controller->repositories->datafield, $controller->eventsManager);
             $item = $this->setSeoTitle($item, $controller);
             $item = SeoUtil::setSlugsOnItem(
                 $item,
@@ -30,10 +35,26 @@ class AdminItemControllerListener
                 $controller->repositories->datafield,
                 $controller->repositories->item,
                 $controller->repositories->language,
-                $controller->eventsManager
+                $datagroup
             );
             $this->clearCache($item, $controller->cache);
         endif;
+    }
+
+    protected function parseDatafields(
+        Item $item,
+        Datagroup $datagroup,
+        DatafieldRepository $datafieldRepository,
+        Manager $eventsManager
+    ): Item {
+        foreach ($datagroup->getDatafields() as $datafieldArray) :
+            $datafield = $datafieldRepository->getById($datafieldArray['id']);
+            if ($datafield !== null) :
+                $eventsManager->fire($datafield->getType() . ':beforeItemSave', $item, $datafield);
+            endif;
+        endforeach;
+
+        return $item;
     }
 
     protected function setSeoTitle(Item $item, AdminitemController $controller): Item
