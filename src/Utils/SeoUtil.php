@@ -9,6 +9,7 @@ use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Database\AbstractCollection;
 use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Datafield\Repositories\DatafieldRepository;
+use VitesseCms\Datagroup\Models\Datagroup;
 use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Language\Repositories\LanguageRepository;
 use VitesseCms\Sef\Helpers\SefHelper;
@@ -21,17 +22,8 @@ class SeoUtil
         DatafieldRepository $datafieldRepository,
         ItemRepository $itemRepository,
         LanguageRepository $languageRepository,
-        Manager $eventsManager
+        Datagroup $datagroup
     ): Item {
-        $datagroup = $datagroupRepository->getById($item->getDatagroup(), false);
-        $item->setIsFilterable($datagroup->hasFilterableFields());
-        foreach ($datagroup->getDatafields() as $datafieldArray) :
-            $datafield = $datafieldRepository->getById($datafieldArray['id']);
-            if (is_object($datafield)) :
-                $eventsManager->fire($datafield->getFieldType() . ':beforeSave', $item, $datafield);
-            endif;
-        endforeach;
-
         $slugCategories = [];
         $slugDatagroups = array_reverse($datagroup->getSlugCategories());
         /** @var Item $previousItem */
