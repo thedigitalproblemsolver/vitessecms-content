@@ -9,6 +9,8 @@ use VitesseCms\Content\Blocks\MainContent;
 use VitesseCms\Content\Blocks\Texteditor;
 use VitesseCms\Content\Controllers\AdminitemController;
 use Phalcon\Events\Manager;
+use VitesseCms\Content\Fields\Model;
+use VitesseCms\Content\Listeners\Fields\ModelListener;
 
 class InitiateAdminListeners
 {
@@ -21,5 +23,6 @@ class InitiateAdminListeners
         $eventsManager->attach(FilterResult::class, new BlockFilterResultListener());
         $eventsManager->attach(Texteditor::class, new BlockTexteditorListener());
         $eventsManager->attach(Itemlist::class, new BlockItemlistListener());
+        $eventsManager->attach(Model::class, new ModelListener());
     }
 }
