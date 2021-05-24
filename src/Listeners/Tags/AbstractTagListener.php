@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace VitesseCms\Content\Listeners;
+namespace VitesseCms\Content\Listeners\Tags;
 
 use VitesseCms\Content\Helpers\EventVehicleHelper;
 use Phalcon\Events\Event;
-use function is_array;
 
 abstract class AbstractTagListener
 {

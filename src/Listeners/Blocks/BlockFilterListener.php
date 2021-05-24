@@ -1,23 +1,42 @@
 <?php declare(strict_types=1);
 
-namespace VitesseCms\Content\Listeners;
+namespace VitesseCms\Content\Listeners\Blocks;
 
 use Phalcon\Events\Event;
 use VitesseCms\Block\Forms\BlockForm;
-use VitesseCms\Block\Interfaces\RepositoryInterface;
 use VitesseCms\Block\Models\Block;
 use VitesseCms\Content\Blocks\Filter;
+use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Database\Models\FindValue;
 use VitesseCms\Database\Models\FindValueIterator;
+use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
 
 class BlockFilterListener
 {
-    public function buildBlockForm(Event $event, BlockForm $form, Block $block): void
+    /**
+     * @var DatagroupRepository
+     */
+    private $datagroupRepository;
+
+    /**
+     * @var ItemRepository
+     */
+    private $itemRepository;
+
+    public function __construct(
+        DatagroupRepository $datagroupRepository,
+        ItemRepository $itemRepository
+    )
     {
-        //move reposiroty to initation file
-        $datagroups = $block->getDi()->repositories->datagroup->findAll(new FindValueIterator(
+        $this->datagroupRepository = $datagroupRepository;
+        $this->itemRepository = $itemRepository;
+    }
+
+    public function buildBlockForm(Event $event, BlockForm $form): void
+    {
+        $datagroups = $this->datagroupRepository->findAll(new FindValueIterator(
             [new FindValue('component', 'content')]
         ));
 
@@ -28,7 +47,7 @@ class BlockFilterListener
             $datagroups->next();
         endwhile;
 
-        $items = $block->getDi()->repositories->item->findAll(
+        $items = $this->itemRepository->findAll(
             new FindValueIterator([new FindValue('datagroup', ['$in' => $datagroupIds])])
         );
 
