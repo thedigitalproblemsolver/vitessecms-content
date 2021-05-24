@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace VitesseCms\Content\Listeners;
+namespace VitesseCms\Content\Listeners\Blocks;
 
 use Phalcon\Events\Event;
 use VitesseCms\Block\Forms\BlockForm;
@@ -10,12 +10,22 @@ use VitesseCms\Content\Enum\ItemListEnum;
 use VitesseCms\Content\Forms\BlockItemlistChildrenOfItemSubForm;
 use VitesseCms\Content\Forms\BlockItemlistDatagroupSubForm;
 use VitesseCms\Content\Forms\BlockItemlistHandpickedSubForm;
+use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Core\Helpers\ItemHelper;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
 
 class BlockItemlistListener
 {
+    /**
+     * @var ItemRepository
+     */
+    private $itemRepository;
+
+    public function __construct(ItemRepository $itemRepository){
+        $this->itemRepository = $itemRepository;
+    }
+
     public function buildBlockForm(Event $event, BlockForm $form, Block $block): void
     {
         $this->buildBaseForm($form, $block);
@@ -56,7 +66,7 @@ class BlockItemlistListener
             'selected' => false,
         ]];
         if ($block->_('readmoreItem')) :
-            $selectedItem = $block->getDi()->repositories->item->getById($block->_('readmoreItem'));
+            $selectedItem = $this->itemRepository->getById($block->_('readmoreItem'));
             if ($selectedItem !== null):
                 $itemPath = ItemHelper::getPathFromRoot($selectedItem);
                 $options[] = [

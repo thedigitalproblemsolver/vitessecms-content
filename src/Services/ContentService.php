@@ -3,12 +3,6 @@
 namespace VitesseCms\Content\Services;
 
 use VitesseCms\Content\Helpers\EventVehicleHelper;
-use VitesseCms\Content\Listeners\TagDiscountListener;
-use VitesseCms\Content\Listeners\TagItemListener;
-use VitesseCms\Content\Listeners\TagOrderSendDateListener;
-use VitesseCms\Content\Listeners\TagShopTrackAndTraceListener;
-use VitesseCms\Content\Listeners\TagSubscribeListener;
-use VitesseCms\Content\Listeners\TagUnsubscribeListener;
 use VitesseCms\Core\Services\AbstractInjectableService;
 use VitesseCms\Core\Services\ViewService;
 use VitesseCms\Sef\Helpers\SefHelper;
@@ -28,17 +22,6 @@ class ContentService extends AbstractInjectableService
     public function __construct(ViewService $viewService)
     {
         $this->view = $viewService;
-
-        /** TODO make module based */
-        if (!$this->eventsManager->hasListeners('contentTag')) :
-            $this->eventsManager->attach('contentTag', new TagDiscountListener());
-            $this->eventsManager->attach('contentTag', new TagItemListener());
-            $this->eventsManager->attach('contentTag', new TagUnsubscribeListener());
-            $this->eventsManager->attach('contentTag', new TagShopTrackAndTraceListener());
-            $this->eventsManager->attach('contentTag', new TagSubscribeListener());
-            $this->eventsManager->attach('contentTag', new TagOrderSendDateListener());
-        endif;
-
         $this->eventInputs = [];
     }
 

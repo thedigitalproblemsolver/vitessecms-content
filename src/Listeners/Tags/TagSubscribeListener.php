@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace VitesseCms\Content\Listeners;
+namespace VitesseCms\Content\Listeners\Tags;
 
 use VitesseCms\Communication\Models\NewsletterQueue;
 use VitesseCms\Content\Helpers\EventVehicleHelper;
