@@ -1,16 +1,27 @@
 <?php declare(strict_types=1);
 
-namespace VitesseCms\Content\Listeners;
+namespace VitesseCms\Content\Listeners\Blocks;
 
 use Phalcon\Events\Event;
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Models\Block;
 use VitesseCms\Content\Blocks\MainContent;
 use VitesseCms\Datagroup\Models\Datagroup;
+use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Form\Models\Attributes;
 
 class BlockMainContentListener
 {
+    /**
+     * @var DatagroupRepository
+     */
+    private $datagroupRepository;
+
+    public function __construct(DatagroupRepository $datagroupRepository)
+    {
+        $this->datagroupRepository = $datagroupRepository;
+    }
+
     public function buildBlockForm(Event $event, BlockForm $form): void
     {
         $form->addToggle('Use datagroup template', 'useDatagroupTemplate')
@@ -23,12 +34,12 @@ class BlockMainContentListener
         $this->handleAddressTemplate($mainContent, $block);
     }
 
-    public function loadAssets(Event $event, MainContent $mainContent, Block $block): void
+    public function loadAssets(Event $event, MainContent $mainContent): void
     {
         if ($mainContent->getDi()->view->hasCurrentItem()) :
             $item = $mainContent->getDi()->view->getCurrentItem();
             /** @var Datagroup $datagroup */
-            $datagroup = $mainContent->getDi()->repositories->datagroup->getById($item->getDatagroup());
+            $datagroup = $this->datagroupRepository->getById($item->getDatagroup());
             if (substr_count($datagroup->getTemplate(), 'address')) :
                 $mainContent->getDi()->assets->loadGoogleMaps(
                     $mainContent->getDi()->setting->get('GOOGLE_MAPS_APIKEY')

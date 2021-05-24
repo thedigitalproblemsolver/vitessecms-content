@@ -27,6 +27,6 @@
     "vitessecms/datafield": "~0.2.7",
     "vitessecms/datagroup": "~0.2.5",
     "vitessecms/block": "~0.2.8",
-    "vitessecms/communication": "~0.2.5"
+    "vitessecms/communication": "~0.2.6"
   }
 }
