@@ -56,7 +56,7 @@ class BlockItemlistListener
             'selected' => false,
         ]];
         if ($block->_('readmoreItem')) :
-            $selectedItem = $block->getDI()->get('repositories')->item->getById($block->_('readmoreItem'));
+            $selectedItem = $block->getDi()->repositories->item->getById($block->_('readmoreItem'));
             if ($selectedItem !== null):
                 $itemPath = ItemHelper::getPathFromRoot($selectedItem);
                 $options[] = [
@@ -80,13 +80,13 @@ class BlockItemlistListener
     {
         switch ($block->_('listMode')) :
             case ItemListEnum::LISTMODE_HANDPICKED:
-                BlockItemlistHandpickedSubForm::getBlockForm($form, $block, $block->getDI()->get('repositories'));
+                BlockItemlistHandpickedSubForm::getBlockForm($form, $block, $block->getDi()->repositories);
                 break;
             case ItemListEnum::LISTMODE_CHILDREN_OF_ITEM:
-                BlockItemlistChildrenOfItemSubForm::getBlockForm($form, $block, $block->getDI()->get('repositories'));
+                BlockItemlistChildrenOfItemSubForm::getBlockForm($form, $block, $block->getDi()->repositories);
                 break;
             case ItemListEnum::LISTMODE_DATAGROUPS:
-                BlockItemlistDatagroupSubForm::getBlockForm($form, $block, $block->getDI()->get('repositories'));
+                BlockItemlistDatagroupSubForm::getBlockForm($form, $block, $block->getDi()->repositories);
                 break;
         endswitch;
 
@@ -104,10 +104,10 @@ class BlockItemlistListener
     {
         if (
             substr_count($block->getTemplate(), 'address_list')
-            && $block->getDi()->get('setting')->has('GOOGLE_MAPS_APIKEY')
+            && $block->getDi()->setting->has('GOOGLE_MAPS_APIKEY')
         ) :
             $block->getDI()->get('assets')->loadGoogleMaps(
-                $block->getDi()->get('setting')->get('GOOGLE_MAPS_APIKEY')
+                $block->getDi()->setting->get('GOOGLE_MAPS_APIKEY')
             );
         endif;
     }
