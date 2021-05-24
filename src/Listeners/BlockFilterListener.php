@@ -14,9 +14,10 @@ use VitesseCms\Form\Models\Attributes;
 
 class BlockFilterListener
 {
-    public function buildBlockForm(Event $event, BlockForm $form): void
+    public function buildBlockForm(Event $event, BlockForm $form, Block $block): void
     {
-        $datagroups = $form->di->get('repositories')->datagroup->findAll(new FindValueIterator(
+        //move reposiroty to initation file
+        $datagroups = $block->getDi()->repositories->datagroup->findAll(new FindValueIterator(
             [new FindValue('component', 'content')]
         ));
 
@@ -27,7 +28,7 @@ class BlockFilterListener
             $datagroups->next();
         endwhile;
 
-        $items = $form->di->get('repositories')->item->findAll(
+        $items = $block->getDi()->repositories->item->findAll(
             new FindValueIterator([new FindValue('datagroup', ['$in' => $datagroupIds])])
         );
 
@@ -47,7 +48,7 @@ class BlockFilterListener
 
     public function loadAssets(Event $event, Filter $filter, Block $block): void
     {
-        $block->getDI()->get('assets')->loadFilter();
-        $block->getDI()->get('assets')->loadSelect2();
+        $block->getDi()->assets->loadFilter();
+        $block->getDi()->assets->loadSelect2();
     }
 }
