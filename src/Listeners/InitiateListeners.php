@@ -2,7 +2,6 @@
 
 namespace VitesseCms\Content\Listeners;
 
-use Phalcon\Events\Manager;
 use VitesseCms\Content\Blocks\MainContent;
 use VitesseCms\Content\Controllers\AdminitemController;
 use VitesseCms\Content\Listeners\Admin\AdminMenuListener;
@@ -14,22 +13,26 @@ use VitesseCms\Content\Listeners\Tags\TagOrderSendDateListener;
 use VitesseCms\Content\Listeners\Tags\TagShopTrackAndTraceListener;
 use VitesseCms\Content\Listeners\Tags\TagSubscribeListener;
 use VitesseCms\Content\Listeners\Tags\TagUnsubscribeListener;
+use VitesseCms\Core\Interfaces\InitiateListenersInterface;
+use VitesseCms\Core\Interfaces\InjectableInterface;
 use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 
-class InitiateListeners
+class InitiateListeners implements InitiateListenersInterface
 {
-    public static function setListeners(Manager $eventsManager): void
+    public static function setListeners(InjectableInterface $di): void
     {
-        $eventsManager->attach('adminMenu', new AdminMenuListener());
-        $eventsManager->attach(AdminitemController::class, new AdminItemControllerListener());
-        $eventsManager->attach(MainContent::class, new BlockMainContentListener(
+        if($di->user->hasAdminAccess()):
+            $di->eventsManager->attach('adminMenu', new AdminMenuListener());
+        endif;
+        $di->eventsManager->attach(AdminitemController::class, new AdminItemControllerListener());
+        $di->eventsManager->attach(MainContent::class, new BlockMainContentListener(
             new DatagroupRepository()
         ));
-        $eventsManager->attach('contentTag', new TagDiscountListener());
-        $eventsManager->attach('contentTag', new TagItemListener());
-        $eventsManager->attach('contentTag', new TagUnsubscribeListener());
-        $eventsManager->attach('contentTag', new TagShopTrackAndTraceListener());
-        $eventsManager->attach('contentTag', new TagSubscribeListener());
-        $eventsManager->attach('contentTag', new TagOrderSendDateListener());
+        $di->eventsManager->attach('contentTag', new TagDiscountListener());
+        $di->eventsManager->attach('contentTag', new TagItemListener());
+        $di->eventsManager->attach('contentTag', new TagUnsubscribeListener());
+        $di->eventsManager->attach('contentTag', new TagShopTrackAndTraceListener());
+        $di->eventsManager->attach('contentTag', new TagSubscribeListener());
+        $di->eventsManager->attach('contentTag', new TagOrderSendDateListener());
     }
 }
