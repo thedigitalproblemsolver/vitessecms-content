@@ -5,16 +5,13 @@ namespace VitesseCms\Content\Listeners\Admin;
 use Phalcon\Events\Event;
 use VitesseCms\Admin\Models\AdminMenu;
 use VitesseCms\Admin\Models\AdminMenuNavBarChildren;
-use VitesseCms\Datagroup\Models\Datagroup;
 
 class AdminMenuListener
 {
     public function AddChildren(Event $event, AdminMenu $adminMenu): void
     {
-        if ($adminMenu->getUser()->getPermissionRole() === 'superadmin') :
-            $adminMenu = $this->addContentGroup('content', 'Content', $adminMenu);
-            $adminMenu = $this->addContentGroup('formOptions', 'DataDesign', $adminMenu);
-        endif;
+        $adminMenu = $this->addContentGroup('content', 'Content', $adminMenu);
+        $adminMenu = $this->addContentGroup('formOptions', 'DataDesign', $adminMenu);
     }
 
     protected function addContentGroup(string $group, string $menuItem, AdminMenu $adminMenu): AdminMenu
