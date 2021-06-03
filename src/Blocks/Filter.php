@@ -9,7 +9,6 @@ use VitesseCms\Content\Models\Item;
 use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Datagroup\Models\Datagroup;
 use VitesseCms\Form\Forms\BaseForm;
-use VitesseCms\Media\Enums\AssetsEnum;
 use MongoDB\BSON\ObjectID;
 use function is_object;
 
