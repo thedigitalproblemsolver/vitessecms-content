@@ -8,7 +8,6 @@ use VitesseCms\Datafield\AbstractField;
 use VitesseCms\Form\AbstractForm;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
-use VitesseCms\Media\Enums\AssetsEnum;
 
 class Model extends AbstractField
 {
@@ -27,7 +26,7 @@ class Model extends AbstractField
         $attributes->setOptions(ElementHelper::arrayToSelectOptions($model::findAll()));
 
         if ($datafield->_('useSelect2')) :
-            $attributes->setInputClass(AssetsEnum::SELECT2);
+            $attributes->setInputClass('select2');
         endif;
 
         if ($datafield->_('multiple')) :
