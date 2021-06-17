@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace VitesseCms\Content\Listeners\Tags;
+namespace VitesseCms\Content\Listeners\ContentTags;
 
 use VitesseCms\Content\Helpers\EventVehicleHelper;
 use Phalcon\Events\Event;
