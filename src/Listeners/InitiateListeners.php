@@ -4,10 +4,12 @@ namespace VitesseCms\Content\Listeners;
 
 use VitesseCms\Content\Blocks\MainContent;
 use VitesseCms\Content\Controllers\AdminitemController;
+use VitesseCms\Content\Enum\ContentEnum;
 use VitesseCms\Content\Listeners\Admin\AdminMenuListener;
 use VitesseCms\Content\Listeners\Blocks\BlockMainContentListener;
 use VitesseCms\Content\Listeners\Controllers\AdminItemControllerListener;
 use VitesseCms\Content\Listeners\ContentTags\TagItemListener;
+use VitesseCms\Content\Listeners\Services\ContentServiceListener;
 use VitesseCms\Core\Interfaces\InitiateListenersInterface;
 use VitesseCms\Core\Interfaces\InjectableInterface;
 use VitesseCms\Datagroup\Repositories\DatagroupRepository;
@@ -25,5 +27,6 @@ class InitiateListeners implements InitiateListenersInterface
         ));
 
         $di->eventsManager->attach('contentTag', new TagItemListener());
+        $di->eventsManager->attach(ContentEnum::ATTACH_SERVICE_LISTENER, new ContentServiceListener($di->view));
     }
 }
