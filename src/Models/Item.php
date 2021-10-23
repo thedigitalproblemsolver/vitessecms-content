@@ -2,6 +2,7 @@
 
 namespace VitesseCms\Content\Models;
 
+use Phalcon\Mvc\View;
 use VitesseCms\Core\Services\ViewService;
 use VitesseCms\Database\AbstractCollection;
 use Phalcon\Di;
@@ -50,7 +51,11 @@ class Item extends AbstractCollection
     public static function findById($id)
     {
         $item = parent::findById($id);
-        $viewService = new ViewService(Di::getDefault()->get('configuration'));
+        $viewService = new ViewService(
+            Di::getDefault()->get('configuration')->getCoreTemplateDir(),
+            Di::getDefault()->get('configuration')->getVendorNameDir(),
+            new View()
+        );
         if (self::$renderFields && $item) :
             $dataFieldTemplates = (new Datafield())->getTemplates();
             foreach ($dataFieldTemplates as $path => $name) :
