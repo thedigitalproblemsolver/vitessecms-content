@@ -14,17 +14,27 @@ class EventVehicleHelper implements EventVehicleInterface, BaseObjectInterface
     /**
      * @var ViewService
      */
-    protected $view;
+    private $view;
 
     /**
      * @var UrlService
      */
-    protected $url;
+    private $url;
 
-    public function __construct(ViewService $viewService, UrlService $urlService)
+    /**\
+     * @var string
+     */
+    private $content;
+
+    public function __construct(
+        ViewService $viewService,
+        UrlService $urlService,
+        string $content
+    )
     {
         $this->view = $viewService;
         $this->url = $urlService;
+        $this->content  = $content;
     }
 
     public function getView(): ViewService
@@ -35,5 +45,15 @@ class EventVehicleHelper implements EventVehicleInterface, BaseObjectInterface
     public function getUrl(): UrlService
     {
         return $this->url;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
+    public function setContent(string $content): void
+    {
+        $this->content = $content;
     }
 }

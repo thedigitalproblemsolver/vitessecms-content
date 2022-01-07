@@ -51,8 +51,7 @@ class ContentService extends AbstractInjectableService
 
     public function parseListeners(string $content, string $type): string
     {
-        $eventVehicle = new EventVehicleHelper($this->view, $this->url);
-        $eventVehicle->set('content', $content);
+        $eventVehicle = new EventVehicleHelper($this->view, $this->url, $content);
         foreach ($this->eventInputs as $key => $value) :
             $eventVehicle->set($key, $value);
         endforeach;
@@ -60,7 +59,7 @@ class ContentService extends AbstractInjectableService
         $this->eventsManager->fire($type . ':apply', $eventVehicle);
         $this->eventInputs = [];
 
-        return $eventVehicle->_('content');
+        return $eventVehicle->getContent();
     }
 
     public function addEventInput(string $key, $value): ContentService
