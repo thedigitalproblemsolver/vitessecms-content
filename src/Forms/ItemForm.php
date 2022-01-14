@@ -3,7 +3,6 @@
 namespace VitesseCms\Content\Forms;
 
 use VitesseCms\Content\Repositories\AdminRepositoryCollection;
-use VitesseCms\Form\AbstractForm;
 use VitesseCms\Content\Models\Item;
 use VitesseCms\Form\AbstractFormWithRepository;
 use VitesseCms\Form\Interfaces\FormWithRepositoryInterface;
