@@ -4,14 +4,14 @@ namespace VitesseCms\Content\Forms;
 
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Interfaces\BlockSubFormInterface;
-use VitesseCms\Block\Interfaces\RepositoryInterface;
 use VitesseCms\Block\Models\Block;
+use VitesseCms\Block\Repositories\AdminRepositoryCollection;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
 
 class BlockItemlistDatagroupSubForm extends AbstractBlockItemlistSubForm implements BlockSubFormInterface
 {
-    public static function getBlockForm(BlockForm $form, Block $block, RepositoryInterface $repositories): void
+    public static function getBlockForm(BlockForm $form, Block $block, AdminRepositoryCollection $repositories): void
     {
         $form->addDropdown(
             '%ADMIN_ITEMS%',

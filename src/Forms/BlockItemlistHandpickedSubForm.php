@@ -4,8 +4,8 @@ namespace VitesseCms\Content\Forms;
 
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Interfaces\BlockSubFormInterface;
-use VitesseCms\Block\Interfaces\RepositoryInterface;
 use VitesseCms\Block\Models\Block;
+use VitesseCms\Block\Repositories\AdminRepositoryCollection;
 use VitesseCms\Database\Models\FindValue;
 use VitesseCms\Database\Models\FindValueIterator;
 use VitesseCms\Form\Helpers\ElementHelper;
@@ -13,7 +13,7 @@ use VitesseCms\Form\Models\Attributes;
 
 class BlockItemlistHandpickedSubForm implements BlockSubFormInterface
 {
-    public static function getBlockForm(BlockForm $form, Block $block, RepositoryInterface $repositories): void
+    public static function getBlockForm(BlockForm $form, Block $block, AdminRepositoryCollection $repositories): void
     {
         $datagroupIds = [];
         $datagroups = $repositories->datagroup->findAll(new FindValueIterator(
