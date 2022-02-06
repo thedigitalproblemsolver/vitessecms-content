@@ -3,27 +3,55 @@
 namespace VitesseCms\Content\Forms;
 
 use VitesseCms\Block\Forms\BlockForm;
-use VitesseCms\Block\Interfaces\RepositoryInterface;
 use VitesseCms\Content\Enum\ItemListEnum;
 use VitesseCms\Content\Fields\Toggle;
+use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Database\Models\FindValue;
 use VitesseCms\Database\Models\FindValueIterator;
+use VitesseCms\Datafield\Repositories\DatafieldRepository;
 use VitesseCms\Datagroup\Fields\Datagroup;
+use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
 use VitesseCms\Shop\Fields\ShopPrice;
 
 abstract class AbstractBlockItemlistSubForm
 {
-    protected static function buildDatafieldValueForm(BlockForm $form, string $datagroupId, RepositoryInterface $repositories): void
+    /**
+     * @var ItemRepository
+     */
+    protected $itemRepository;
+
+    /**
+     * @var DatagroupRepository
+     */
+    protected $datagroupRepository;
+
+    /**
+     * @var DatafieldRepository
+     */
+    protected $datafieldRepository;
+
+    public function __construct(
+        ItemRepository      $itemRepository,
+        DatagroupRepository $datagroupRepository,
+        DatafieldRepository $datafieldRepository
+    )
     {
-        $datagroup = $repositories->datagroup->getById($datagroupId);
+        $this->itemRepository = $itemRepository;
+        $this->datagroupRepository = $datagroupRepository;
+        $this->datafieldRepository = $datafieldRepository;
+    }
+
+    protected function buildDatafieldValueForm(BlockForm $form, string $datagroupId): void
+    {
+        $datagroup = $this->datagroupRepository->getById($datagroupId);
         if ($datagroup !== null) :
             $form->addHtml('<h2>' . $datagroup->_('name') . '</h2>');
             foreach ($datagroup->getDatafields() as $datafieldOptions) :
                 /** @var Datafield $datafield */
-                $datafield = $repositories->datafield->getById($datafieldOptions['id']);
+                $datafield = $this->datafieldRepository->getById($datafieldOptions['id']);
                 if ($datafield !== null) :
                     $fieldName = 'datafieldValue[' . $datafield->getCallingName() . ']';
                     $name = $datafield->getNameField();
@@ -53,7 +81,7 @@ abstract class AbstractBlockItemlistSubForm
                         case Datagroup::class:
                             $options = [];
                             if ($datafield->getDatagroup() !== null) {
-                                $items = $repositories->item->findAll(new FindValueIterator(
+                                $items = $this->itemRepository->findAll(new FindValueIterator(
                                     [new FindValue('datagroup', $datafield->getDatagroup())]
                                 ));
                                 $options = ElementHelper::modelIteratorToOptions($items);

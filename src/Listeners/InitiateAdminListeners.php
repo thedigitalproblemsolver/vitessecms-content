@@ -20,6 +20,7 @@ use VitesseCms\Content\Listeners\Fields\ModelListener;
 use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Core\Interfaces\InitiateListenersInterface;
 use VitesseCms\Core\Interfaces\InjectableInterface;
+use VitesseCms\Datafield\Repositories\DatafieldRepository;
 use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 
 class InitiateAdminListeners implements InitiateListenersInterface
@@ -38,7 +39,9 @@ class InitiateAdminListeners implements InitiateListenersInterface
         $di->eventsManager->attach(FilterResult::class, new BlockFilterResultListener());
         $di->eventsManager->attach(Texteditor::class, new BlockTexteditorListener());
         $di->eventsManager->attach(Itemlist::class, new BlockItemlistListener(
-            new ItemRepository()
+            new ItemRepository(),
+            new DatagroupRepository(),
+            new DatafieldRepository()
         ));
         $di->eventsManager->attach(Model::class, new ModelListener());
     }
