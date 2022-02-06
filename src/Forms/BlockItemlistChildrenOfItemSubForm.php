@@ -5,15 +5,18 @@ namespace VitesseCms\Content\Forms;
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Interfaces\BlockSubFormInterface;
 use VitesseCms\Block\Models\Block;
-use VitesseCms\Block\Repositories\AdminRepositoryCollection;
+use VitesseCms\Block\Repositories\RepositoryCollection;
+use VitesseCms\Content\Repositories\AdminRepositoryCollection;
+use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Core\Helpers\ItemHelper;
 use VitesseCms\Database\Models\FindValue;
 use VitesseCms\Database\Models\FindValueIterator;
+use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Form\Models\Attributes;
 
 class BlockItemlistChildrenOfItemSubForm extends AbstractBlockItemlistSubForm implements BlockSubFormInterface
 {
-    public static function getBlockForm(BlockForm $form, Block $block, AdminRepositoryCollection $repositories): void
+    public function getBlockForm(BlockForm $form, Block $block): void
     {
         $selectedItem = null;
 
@@ -23,7 +26,7 @@ class BlockItemlistChildrenOfItemSubForm extends AbstractBlockItemlistSubForm im
             'selected' => false,
         ]];
         if ($block->_('item')) :
-            $selectedItem = $repositories->item->getById($block->_('item'));
+            $selectedItem = $this->itemRepository->getById($block->_('item'));
             $itemPath = ItemHelper::getPathFromRoot($selectedItem);
             $options[] = [
                 'value' => (string)$selectedItem->getId(),
@@ -43,12 +46,12 @@ class BlockItemlistChildrenOfItemSubForm extends AbstractBlockItemlistSubForm im
         );
 
         if ($selectedItem !== null) :
-            $datagroupChildren = $repositories->datagroup->findAll(new FindValueIterator(
+            $datagroupChildren = $this->datagroupRepository->findAll(new FindValueIterator(
                 [new FindValue('parentId', $selectedItem->getDatagroup())]
             ));
             while ($datagroupChildren->valid()) :
                 $datagroupChild = $datagroupChildren->current();
-                self::buildDatafieldValueForm($form, (string)$datagroupChild->getId(), $repositories);
+                $this->buildDatafieldValueForm($form, (string)$datagroupChild->getId());
                 $datagroupChildren->next();
             endwhile;
         endif;

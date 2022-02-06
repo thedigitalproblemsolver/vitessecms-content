@@ -5,18 +5,19 @@ namespace VitesseCms\Content\Forms;
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Interfaces\BlockSubFormInterface;
 use VitesseCms\Block\Models\Block;
-use VitesseCms\Block\Repositories\AdminRepositoryCollection;
+use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Database\Models\FindValue;
 use VitesseCms\Database\Models\FindValueIterator;
+use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
 
-class BlockItemlistHandpickedSubForm implements BlockSubFormInterface
+class BlockItemlistHandpickedSubForm extends AbstractBlockItemlistSubForm implements BlockSubFormInterface
 {
-    public static function getBlockForm(BlockForm $form, Block $block, AdminRepositoryCollection $repositories): void
+    public function getBlockForm(BlockForm $form, Block $block): void
     {
         $datagroupIds = [];
-        $datagroups = $repositories->datagroup->findAll(new FindValueIterator(
+        $datagroups = $this->datagroupRepository->findAll(new FindValueIterator(
             [new FindValue('component', ['$in' => ['content', 'webshopProduct']])]
         ));
 
@@ -31,7 +32,7 @@ class BlockItemlistHandpickedSubForm implements BlockSubFormInterface
             'items',
             (new Attributes())
                 ->setMultiple(true)
-                ->setOptions(ElementHelper::modelIteratorToOptions($repositories->item->findAll(
+                ->setOptions(ElementHelper::modelIteratorToOptions($this->itemRepository->findAll(
                     new FindValueIterator(
                         [new FindValue('datagroup', ['$in' => $datagroupIds])]
                     ),
