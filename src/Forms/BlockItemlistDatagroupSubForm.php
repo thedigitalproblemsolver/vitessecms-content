@@ -5,13 +5,14 @@ namespace VitesseCms\Content\Forms;
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Interfaces\BlockSubFormInterface;
 use VitesseCms\Block\Models\Block;
-use VitesseCms\Block\Repositories\AdminRepositoryCollection;
+use VitesseCms\Content\Repositories\ItemRepository;
+use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
 
 class BlockItemlistDatagroupSubForm extends AbstractBlockItemlistSubForm implements BlockSubFormInterface
 {
-    public static function getBlockForm(BlockForm $form, Block $block, AdminRepositoryCollection $repositories): void
+    public function getBlockForm(BlockForm $form, Block $block): void
     {
         $form->addDropdown(
             '%ADMIN_ITEMS%',
@@ -19,12 +20,12 @@ class BlockItemlistDatagroupSubForm extends AbstractBlockItemlistSubForm impleme
             (new Attributes())
                 ->setMultiple(true)
                 ->setInputClass('select2')
-                ->setOptions(ElementHelper::modelIteratorToOptions($repositories->datagroup->findAll()))
+                ->setOptions(ElementHelper::modelIteratorToOptions($this->datagroupRepository->findAll()))
         );
 
         if (is_array($block->_('items'))) :
             foreach ($block->_('items') as $datagroupId) :
-                self::buildDatafieldValueForm($form, $datagroupId, $repositories);
+                $this->buildDatafieldValueForm($form, $datagroupId);
             endforeach;
             $form->addText('parentId', 'datafieldValue[parentId]');
         endif;

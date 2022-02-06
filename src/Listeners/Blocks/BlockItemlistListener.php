@@ -12,6 +12,8 @@ use VitesseCms\Content\Forms\BlockItemlistDatagroupSubForm;
 use VitesseCms\Content\Forms\BlockItemlistHandpickedSubForm;
 use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Core\Helpers\ItemHelper;
+use VitesseCms\Datafield\Repositories\DatafieldRepository;
+use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
 
@@ -22,8 +24,24 @@ class BlockItemlistListener
      */
     private $itemRepository;
 
-    public function __construct(ItemRepository $itemRepository){
+    /**
+     * @var DatagroupRepository
+     */
+    private $datagroupRepository;
+
+    /**
+     * @var DatafieldRepository
+     */
+    private $datafieldRepository;
+
+    public function __construct(
+        ItemRepository $itemRepository,
+        DatagroupRepository $datagroupRepository,
+        DatafieldRepository $datafieldRepository
+    ){
         $this->itemRepository = $itemRepository;
+        $this->datagroupRepository = $datagroupRepository;
+        $this->datafieldRepository  =$datafieldRepository;
     }
 
     public function buildBlockForm(Event $event, BlockForm $form, Block $block): void
@@ -90,13 +108,25 @@ class BlockItemlistListener
     {
         switch ($block->_('listMode')) :
             case ItemListEnum::LISTMODE_HANDPICKED:
-                BlockItemlistHandpickedSubForm::getBlockForm($form, $block, $block->getDi()->repositories);
+                (new BlockItemlistHandpickedSubForm(
+                    $this->itemRepository,
+                    $this->datagroupRepository,
+                    $this->datafieldRepository
+                ))->getBlockForm($form, $block);
                 break;
             case ItemListEnum::LISTMODE_CHILDREN_OF_ITEM:
-                BlockItemlistChildrenOfItemSubForm::getBlockForm($form, $block, $block->getDi()->repositories);
+                (new BlockItemlistChildrenOfItemSubForm(
+                    $this->itemRepository,
+                    $this->datagroupRepository,
+                    $this->datafieldRepository
+                ))->getBlockForm($form, $block);
                 break;
             case ItemListEnum::LISTMODE_DATAGROUPS:
-                BlockItemlistDatagroupSubForm::getBlockForm($form, $block, $block->getDi()->repositories);
+                (new BlockItemlistDatagroupSubForm(
+                    $this->itemRepository,
+                    $this->datagroupRepository,
+                    $this->datafieldRepository
+                ))->getBlockForm($form, $block);
                 break;
         endswitch;
 
