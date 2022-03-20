@@ -31,7 +31,10 @@ class SeoUtil
         foreach ($slugDatagroups as $datagroupArray) :
             if (is_array($datagroupArray) && $previousItem) :
                 if ($datagroupArray['published'] && $previousItem->getParentId() !== null):
-                    $slugCategories[] = $itemRepository->getById($previousItem->getParentId(), false);
+                    $result = $itemRepository->getById($previousItem->getParentId(), false);
+                    if($result !== null) :
+                        $slugCategories[] = $result;
+                    endif;
                 endif;
             endif;
         endforeach;
