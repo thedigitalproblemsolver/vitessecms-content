@@ -19,7 +19,7 @@
   },
   "require": {
     "chriskonnertz/open-graph": "^1.0",
-    "vitessecms/language": "~0.2.3",
+    "vitessecms/language": "~0.2.4",
     "vitessecms/sef": "~0.2.1",
     "vitessecms/setting": "~0.2.5",
     "vitessecms/core": "~0.2.21",
