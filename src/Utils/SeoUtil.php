@@ -28,12 +28,13 @@ class SeoUtil
         $slugDatagroups = array_reverse($datagroup->getSlugCategories());
         /** @var Item $previousItem */
         $previousItem = clone $item;
+
         foreach ($slugDatagroups as $datagroupArray) :
             if (is_array($datagroupArray) && $previousItem) :
                 if ($datagroupArray['published'] && $previousItem->getParentId() !== null):
-                    $result = $itemRepository->getById($previousItem->getParentId(), false);
-                    if($result !== null) :
-                        $slugCategories[] = $result;
+                    $previousItem = $itemRepository->getById($previousItem->getParentId(), false);
+                    if($previousItem !== null) :
+                        $slugCategories[] = $previousItem;
                     endif;
                 endif;
             endif;
@@ -61,7 +62,8 @@ class SeoUtil
                 foreach ($slugCategories as $slugCategory) :
                     $slugParts[] = Slug::generate($slugCategory->_('name', $language->getShortCode()));
                 endforeach;
-                $slugs[$language->getShortCode()] = implode($datagroup->getSlugDelimiter(), $slugParts);
+
+                $slugs[$language->getShortCode()] = implode($datagroup->slugCategoryDelimiter(), $slugParts);
                 if (substr_count($slugs[$language->getShortCode()], 'page:') === 0) :
                     $slugs[$language->getShortCode()] .= '/';
                 endif;
