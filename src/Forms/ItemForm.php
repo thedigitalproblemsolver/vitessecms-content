@@ -35,6 +35,14 @@ class ItemForm extends AbstractFormWithRepository
             $this->addNumber('%ADMIN_ORDERING%', 'ordering')
                 ->addAcl('%ADMIN_PERMISSION_ROLES%', 'roles')
                 ->addSubmitButton('%CORE_SAVE%');
+            if($this->_entity !== null) :
+                $this->addHtml('<a 
+                    href="'.$this->url->getBaseUri().'admin/content/adminitem/delete/'.(string)$this->_entity->getId().'" 
+                    id="delete_'.(string)$this->_entity->getId().'" 
+                    class="fa fa-trash" 
+                    title="Verwijder item"
+                ></a>');
+            endif;
         }
 
         return $this;
