@@ -36,6 +36,12 @@ class InitiateListeners implements InitiateListenersInterface
         ));
 
         $di->eventsManager->attach('contentTag', new TagItemListener());
-        $di->eventsManager->attach(ContentEnum::ATTACH_SERVICE_LISTENER, new ContentServiceListener($di->view));
+        $di->eventsManager->attach(ContentEnum::ATTACH_SERVICE_LISTENER, new ContentServiceListener(
+            $di->view,
+            $di->url,
+            $di->eventsManager,
+            $di->language,
+            $di->setting
+        ));
     }
 }
