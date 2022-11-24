@@ -6,6 +6,7 @@ use Phalcon\Events\Event;
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Models\Block;
 use VitesseCms\Content\Blocks\MainContent;
+use VitesseCms\Content\Models\Item;
 use VitesseCms\Datagroup\Models\Datagroup;
 use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Form\Models\Attributes;
@@ -17,9 +18,17 @@ class BlockMainContentListener
      */
     private $datagroupRepository;
 
-    public function __construct(DatagroupRepository $datagroupRepository)
-    {
+    /**
+     * @var Item|null
+     */
+    private $currentItem;
+
+    public function __construct(
+        DatagroupRepository $datagroupRepository,
+        ?Item $currentItem
+    ){
         $this->datagroupRepository = $datagroupRepository;
+        $this->currentItem = $currentItem;
     }
 
     public function buildBlockForm(Event $event, BlockForm $form): void
@@ -36,10 +45,9 @@ class BlockMainContentListener
 
     public function loadAssets(Event $event, MainContent $mainContent): void
     {
-        if ($mainContent->getDi()->view->hasCurrentItem()) :
-            $item = $mainContent->getDi()->view->getCurrentItem();
+        if ($this->currentItem !== null) :
             /** @var Datagroup $datagroup */
-            $datagroup = $this->datagroupRepository->getById($item->getDatagroup());
+            $datagroup = $this->datagroupRepository->getById($this->currentItem->getDatagroup());
             if (substr_count($datagroup->getTemplate(), 'address')) :
                 $mainContent->getDi()->assets->loadGoogleMaps(
                     $mainContent->getDi()->setting->get('GOOGLE_MAPS_APIKEY')

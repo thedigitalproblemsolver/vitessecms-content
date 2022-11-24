@@ -32,7 +32,8 @@ class InitiateListeners implements InitiateListenersInterface
             new LanguageRepository()
         )));
         $di->eventsManager->attach(MainContent::class, new BlockMainContentListener(
-            new DatagroupRepository()
+            new DatagroupRepository(),
+            $di->view->getCurrentItem()
         ));
 
         $di->eventsManager->attach('contentTag', new TagItemListener());
