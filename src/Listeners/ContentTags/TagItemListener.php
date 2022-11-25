@@ -2,6 +2,7 @@
 
 namespace VitesseCms\Content\Listeners\ContentTags;
 
+use VitesseCms\Content\DTO\TagListenerDTO;
 use VitesseCms\Content\Helpers\EventVehicleHelper;
 use VitesseCms\Content\Models\Item;
 use VitesseCms\Core\Helpers\ItemHelper;
@@ -15,9 +16,9 @@ class TagItemListener extends AbstractTagListener
         $this->name = 'ITEM';
     }
 
-    protected function parse(EventVehicleHelper $contentVehicle, string $tagString): void
+    protected function parse(EventVehicleHelper $contentVehicle, TagListenerDTO $tagListenerDTO): void
     {
-        $tagOptions = explode(';', $tagString);
+        $tagOptions = explode(';', $tagListenerDTO->getTagString());
         $replace = '';
 
         if (!empty($tagOptions[1])) :
@@ -82,7 +83,7 @@ class TagItemListener extends AbstractTagListener
         $contentVehicle->set(
             'content',
             str_replace(
-                '{' . $this->name . $tagString . '}',
+                '{' . $this->name . $tagListenerDTO->getTagString() . '}',
                 $replace,
                 $contentVehicle->_('content')
             )
