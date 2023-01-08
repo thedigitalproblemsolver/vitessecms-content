@@ -13,6 +13,7 @@ use VitesseCms\Datagroup\Models\Datagroup;
 use VitesseCms\Datagroup\Repositories\DatagroupRepository;
 use VitesseCms\Language\Repositories\LanguageRepository;
 use VitesseCms\Sef\Helpers\SefHelper;
+use VitesseCms\Sef\Utils\SefUtil;
 
 class SeoUtil
 {
@@ -60,7 +61,7 @@ class SeoUtil
             if (count($slugCategories) > 0):
                 /** @var AbstractCollection $slugCategory */
                 foreach ($slugCategories as $slugCategory) :
-                    $slugParts[] = Slug::generate($slugCategory->_('name', $language->getShortCode()));
+                    $slugParts[] = SefUtil::generateSlugFromString($slugCategory->_('name', $language->getShortCode()));
                 endforeach;
 
                 $slugs[$language->getShortCode()] = implode($datagroup->slugCategoryDelimiter(), $slugParts);
