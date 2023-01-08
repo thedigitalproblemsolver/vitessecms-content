@@ -3,7 +3,6 @@
 namespace VitesseCms\Content\Utils;
 
 use Phalcon\Events\Manager;
-use Phalcon\Utils\Slug;
 use VitesseCms\Content\Models\Item;
 use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Database\AbstractCollection;
