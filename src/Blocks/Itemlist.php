@@ -100,8 +100,8 @@ class Itemlist extends AbstractBlockModel
             $block->set('items', $items);
         endif;
 
-        $markerFile = $this->di->config->get('uploadDir') . 'google-maps-icon-marker.png';
-        $markerUrl = $this->di->url->getBaseUri() . 'uploads/' . $this->di->config->get('account') . '/google-maps-icon-marker.png';
+        $markerFile = $block->getDi()->get('configuration')->getUploadDir() . 'google-maps-icon-marker.png';
+        $markerUrl = $block->getDi()->get('url')->getBaseUri() . 'uploads/' . $block->getDi()->get('configuration')->getAccount() . '/google-maps-icon-marker.png';
         if (is_file($markerFile)) :
             $block->set('googleMapsMarkerIcon', $markerUrl);
         endif;
