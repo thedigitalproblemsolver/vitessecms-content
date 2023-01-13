@@ -10,17 +10,16 @@ class MainContent extends AbstractBlockModel
     public function parse(Block $block): void
     {
         parent::parse($block);
-
         if ($this->view->hasCurrentItem()) :
             $item = $this->view->getCurrentItem();
             if($block->getBool('useDatagroupTemplate')) :
-                $datagroup = $this->di->repositories->datagroup->getById($item->getDatagroup());
+                $datagroup = $this->di->get('repositories')->datagroup->getById($item->getDatagroup());
                 if ($datagroup->getTemplate() !== null) :
                     $this->template = $datagroup->getTemplate();
                 endif;
             endif;
             $block->set('imageFullWidth', true);
-            $this->di->eventsManager->fire(get_class($this) . ':parse', $this, $block);
+            $this->di->get('eventsManager')->fire(get_class($this) . ':parse', $this, $block);
         endif;
     }
 

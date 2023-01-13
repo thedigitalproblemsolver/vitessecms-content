@@ -2,6 +2,8 @@
 
 namespace VitesseCms\Content\Listeners\ContentTags;
 
+use Phalcon\Tag;
+use VitesseCms\Content\DTO\TagListenerDTO;
 use VitesseCms\Content\Helpers\EventVehicleHelper;
 use Phalcon\Events\Event;
 
@@ -15,7 +17,7 @@ abstract class AbstractTagListener
             $tagsFromBody = $this->getTagsFromBody($contentVehicle->_('content'));
             if (is_array($tagsFromBody) && isset($tagsFromBody[1]) && is_array($tagsFromBody[1])) :
                 foreach ($tagsFromBody[1] as $tagString) :
-                    $this->parse($contentVehicle, $tagString);
+                    $this->parse($contentVehicle, new TagListenerDTO($tagString));
                 endforeach;
             endif;
         endif;
@@ -33,5 +35,5 @@ abstract class AbstractTagListener
         return $tagsFromBody;
     }
 
-    abstract protected function parse(EventVehicleHelper $contentVehicle, string $tagString): void;
+    abstract protected function parse(EventVehicleHelper $contentVehicle, TagListenerDTO $tagListenerDTO): void;
 }

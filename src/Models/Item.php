@@ -2,10 +2,11 @@
 
 namespace VitesseCms\Content\Models;
 
+use Phalcon\Incubator\MongoDB\Mvc\CollectionInterface;
 use Phalcon\Mvc\View;
 use VitesseCms\Core\Services\ViewService;
 use VitesseCms\Database\AbstractCollection;
-use Phalcon\Di;
+use Phalcon\Di\Di;
 use VitesseCms\Datafield\Models\Datafield;
 
 class Item extends AbstractCollection
@@ -45,10 +46,9 @@ class Item extends AbstractCollection
     protected $isFilterable = false;
 
     /**
-     * {@inheritdoc}
      * @deprecated move to repositrory or helper
      */
-    public static function findById($id)
+    public static function findById($id): ?CollectionInterface
     {
         $item = parent::findById($id);
         $viewService = new ViewService(

@@ -39,7 +39,8 @@ class InitiateAdminListeners implements InitiateListenersInterface
             )
         ));
         $di->eventsManager->attach(MainContent::class, new BlockMainContentListener(
-            new DatagroupRepository()
+            new DatagroupRepository(),
+            $di->view->getCurrentItem()
         ));
         $di->eventsManager->attach(Filter::class, new BlockFilterListener(
             new DatagroupRepository(),

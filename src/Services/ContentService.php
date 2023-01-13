@@ -2,12 +2,16 @@
 
 namespace VitesseCms\Content\Services;
 
+use Phalcon\Events\Manager;
 use VitesseCms\Content\Helpers\EventVehicleHelper;
 use VitesseCms\Core\Services\AbstractInjectableService;
+use VitesseCms\Core\Services\UrlService;
 use VitesseCms\Core\Services\ViewService;
+use VitesseCms\Language\Services\LanguageService;
 use VitesseCms\Sef\Helpers\SefHelper;
+use VitesseCms\Setting\Services\SettingService;
 
-class ContentService extends AbstractInjectableService
+class ContentService
 {
     /**
      * @var array
@@ -19,10 +23,39 @@ class ContentService extends AbstractInjectableService
      */
     protected $view;
 
-    public function __construct(ViewService $viewService)
-    {
+    /**
+     * @var UrlService
+     */
+    protected $url;
+
+    /**
+     * @var Manager
+     */
+    protected $eventsManager;
+
+    /**
+     * @var LanguageService
+     */
+    protected $language;
+
+    /**
+     * @var SettingService
+     */
+    protected $setting;
+
+    public function __construct(
+        ViewService $viewService,
+        UrlService $urlService,
+        Manager $eventsManager,
+        LanguageService $languageService,
+        SettingService $settingService
+    ){
         $this->view = $viewService;
         $this->eventInputs = [];
+        $this->url = $urlService;
+        $this->eventsManager = $eventsManager;
+        $this->language = $languageService;
+        $this->setting = $settingService;
     }
 
     public function parseContent(

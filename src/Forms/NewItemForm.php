@@ -11,11 +11,6 @@ use VitesseCms\Form\Models\Attributes;
 
 class NewItemForm extends AbstractFormWithRepository
 {
-    /**
-     * @var AdminRepositoryCollection
-     */
-    protected $repositories;
-
     public function buildForm(): FormWithRepositoryInterface
     {
         $parentId = $this->request->get('parentId', null);
