@@ -15,7 +15,6 @@ class Breadcrumbs extends AbstractBlockModel
 
         if (
             !AdminUtil::isAdminPage()
-            && !$this->di->shop->checkout->isCurrentItemCheckout()
             && $this->view->hasCurrentItem()
         ) {
             $block->set('items', ItemHelper::getPathFromRoot($this->view->getCurrentItem()));
