@@ -177,4 +177,20 @@ class Itemlist extends AbstractBlockModel
             $block->set('readmoreItem', $item);
         endif;
     }
+
+    public function getTemplateParams(Block $block): array
+    {
+        $params = ['block' => $block];
+        if(substr_count($this->getTemplate(), 'header_image') > 0 ) {
+            if ($this->has('headerImage')) {
+                $params['image'] = $this->di->configuration->getUploadUri().$this->has('headerImage');
+            } else {
+                $params['image'] = $this->getDi()->get('configuration')->getUploadUri().
+                    $this->getDi()->get('setting')->getString('HEADER_IMAGE_DEFAULT')
+                ;
+                $params['imageName'] = $this->getDi()->get('setting')->getString('WEBSITE_DEFAULT_NAME');
+            }
+        }
+        return $params;
+    }
 }
