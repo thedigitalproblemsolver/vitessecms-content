@@ -5,6 +5,7 @@ namespace VitesseCms\Content\Listeners;
 use VitesseCms\Content\Blocks\MainContent;
 use VitesseCms\Content\Controllers\AdminitemController;
 use VitesseCms\Content\Enum\ContentEnum;
+use VitesseCms\Content\Enum\ItemEnum;
 use VitesseCms\Content\Listeners\Admin\AdminMenuListener;
 use VitesseCms\Content\Listeners\Blocks\BlockMainContentListener;
 use VitesseCms\Content\Listeners\ContentTags\TagItemListener;
@@ -44,5 +45,6 @@ class InitiateListeners implements InitiateListenersInterface
             $di->language,
             $di->setting
         ));
+        $di->eventsManager->attach(ItemEnum::ITEM_LISTENER, new ItemListener(new ItemRepository()));
     }
 }
