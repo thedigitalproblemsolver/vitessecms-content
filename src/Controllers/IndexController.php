@@ -2,35 +2,35 @@
 
 namespace VitesseCms\Content\Controllers;
 
-use VitesseCms\Content\Repositories\RepositoriesInterface;
-use VitesseCms\Core\AbstractController;
-use VitesseCms\Content\Models\Item;
+use VitesseCms\Content\Enum\ItemEnum;
+use VitesseCms\Content\Repositories\ItemRepository;
+use VitesseCms\Core\AbstractControllerFrontend;
 use VitesseCms\Core\Helpers\ItemHelper;
 use VitesseCms\Database\Models\FindValue;
 use VitesseCms\Database\Models\FindValueIterator;
 
-class IndexController extends AbstractController implements RepositoriesInterface
+class IndexController extends AbstractControllerFrontend
 {
-    public function indexAction(): void
+    private ItemRepository $itemRepository;
+
+    public function OnConstruct()
     {
-        $this->prepareView();
+        parent::onConstruct();
+
+        $this->itemRepository = $this->eventsManager->fire(ItemEnum::GET_REPOSITORY, new \stdClass());
     }
 
-    public function searchAction(): void
+    public function searchAction(string $searchString): void
     {
         $result = ['items' => []];
 
-        if ($this->request->isAjax() && strlen($this->request->get('search')) > 1) :
-            $items = $this->repositories->item->findAll(new FindValueIterator(
-                [new FindValue(
-                    'name.' . $this->configuration->getLanguageShort(),
-                    $this->request->get('search'),
-                    'like'
-                )]
+        if ($this->request->isAjax() && strlen($searchString) > 1) {
+            $items = $this->itemRepository->findAll(new FindValueIterator(
+                [new FindValue('name.' . $this->configService->getLanguageShort(), $searchString, 'like')]
             ));
 
-            if ($items->count() > 0) :
-                while ($items->valid()) :
+            if ($items->count() > 0) {
+                while ($items->valid()) {
                     $item = $items->current();
                     $path = ItemHelper::getPathFromRoot($item);
                     $tmp = [
@@ -38,29 +38,11 @@ class IndexController extends AbstractController implements RepositoriesInterfac
                         'name' => implode(' - ', $path),
                     ];
                     $result['items'][] = $tmp;
-                    $item = $items->next();
-                endwhile;
-            endif;
-        endif;
-
-        $this->prepareJson($result);
-    }
-
-    public function setGeoCoordinatesAction(): void
-    {
-        if (
-            $this->request->isAjax()
-            && !empty($this->request->getPost('latitude'))
-            && !empty($this->request->getPost('longitude'))
-        ) {
-            $item = $this->repositories->item->getById($this->request->getPost('id'));
-            if ($item !== null):
-                $item->set('latitude', $this->request->getPost('latitude'))
-                    ->set('longitude', $this->request->getPost('longitude'))
-                    ->save();
-            endif;
+                    $items->next();
+                }
+            }
         }
 
-        $this->disableView();
+        $this->jsonResponse($result);
     }
 }
