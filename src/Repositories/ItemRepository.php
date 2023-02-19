@@ -85,11 +85,13 @@ class ItemRepository
 
     public function findFirst(
         ?FindValueIterator $findValues = null,
-        bool $hideUnpublished = true
+        bool $hideUnpublished = true,
+        ?FindOrderIterator $findOrders = null
     ): ?Item
     {
         Item::setFindPublished($hideUnpublished);
         $this->parsefindValues($findValues);
+        $this->parseFindOrders($findOrders);
 
         /** @var Item $item */
         $item = Item::findFirst();
