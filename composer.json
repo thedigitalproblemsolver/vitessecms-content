@@ -29,6 +29,6 @@
     "vitessecms/datafield": "~0.3.2",
     "vitessecms/datagroup": "~0.4.0",
     "vitessecms/block": "~0.4.1",
-    "vitessecms/mustache": "~0.4.1"
+    "vitessecms/mustache": "~0.4.3"
   }
 }
