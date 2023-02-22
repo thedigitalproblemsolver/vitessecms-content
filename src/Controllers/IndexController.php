@@ -20,6 +20,10 @@ class IndexController extends AbstractControllerFrontend
         $this->itemRepository = $this->eventsManager->fire(ItemEnum::GET_REPOSITORY, new \stdClass());
     }
 
+    public function indexAction(): void
+    {
+    }
+
     public function searchAction(string $searchString): void
     {
         $result = ['items' => []];

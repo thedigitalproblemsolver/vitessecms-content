@@ -180,7 +180,7 @@ class Itemlist extends AbstractBlockModel
 
     public function getTemplateParams(Block $block): array
     {
-        $params = ['block' => $block];
+        $params = parent::getTemplateParams($block);
         if(substr_count($this->getTemplate(), 'header_image') > 0 ) {
             if ($this->has('headerImage')) {
                 $params['image'] = $this->di->configuration->getUploadUri().$this->has('headerImage');
