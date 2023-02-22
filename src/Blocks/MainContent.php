@@ -30,9 +30,9 @@ class MainContent extends AbstractBlockModel
 
     public function getTemplateParams(Block $block): array
     {
-        return [
-            'block' => $block,
-            'pagination' => $block->_('pagination')
-        ];
+        $params = parent::getTemplateParams($block);
+        $params['pagination'] = $block->_('pagination');
+
+        return $params;
     }
 }
