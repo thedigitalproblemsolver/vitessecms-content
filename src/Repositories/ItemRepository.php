@@ -13,14 +13,18 @@ class ItemRepository
         ?FindValueIterator $findValues = null,
         bool $hideUnpublished = true,
         ?int $limit = null,
-        ?FindOrderIterator $findOrders = null
+        ?FindOrderIterator $findOrders = null,
+        ?array $returnFields = null
     ): ItemIterator
     {
         Item::setFindPublished($hideUnpublished);
         Item::addFindOrder('name');
-        if ($limit !== null) :
+        if ($limit !== null) {
             Item::setFindLimit($limit);
-        endif;
+        }
+        if ($returnFields !== null) {
+            Item::setReturnFields($returnFields);
+        }
         $this->parseFindValues($findValues);
         $this->parseFindOrders($findOrders);
 
