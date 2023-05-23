@@ -22,14 +22,14 @@
     "ext-phalcon": "5.1.4",
     "chriskonnertz/open-graph": "^1.0",
     "vitessecms/language": "^1.0.0",
-    "vitessecms/sef": "~0.3.4",
-    "vitessecms/setting": "~0.3.5",
+    "vitessecms/sef": "^1.0.0",
+    "vitessecms/setting": "^1.0.0",
     "vitessecms/core": "^1.0.0",
-    "vitessecms/form": "~0.4.5",
-    "vitessecms/datafield": "~0.3.4",
-    "vitessecms/datagroup": "~0.4.2",
+    "vitessecms/form": "^1.0.0",
+    "vitessecms/datafield": "^1.0.0",
+    "vitessecms/datagroup": "^1.0.0",
     "vitessecms/block": "^1.0.0",
-    "vitessecms/mustache": "~0.5.0",
+    "vitessecms/mustache": "^1.0.0",
     "vitessecms/adminm": "^1.0.0"
   }
 }
