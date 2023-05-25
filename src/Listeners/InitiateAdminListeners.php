@@ -2,6 +2,8 @@
 
 namespace VitesseCms\Content\Listeners;
 
+use VitesseCms\Analytics\Controllers\AdminanalyticsentryController;
+use VitesseCms\Analytics\Listeners\Controllers\AdminanalyticsentryControllerListener;
 use VitesseCms\Content\Blocks\Filter;
 use VitesseCms\Content\Blocks\FilterResult;
 use VitesseCms\Content\Blocks\Itemlist;
@@ -54,5 +56,6 @@ class InitiateAdminListeners implements InitiateListenersInterface
             new DatafieldRepository()
         ));
         $di->eventsManager->attach(Model::class, new ModelListener());
+        $di->eventsManager->attach(AdminanalyticsentryController::class, new AdminanalyticsentryControllerListener());
     }
 }
