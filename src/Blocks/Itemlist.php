@@ -123,7 +123,11 @@ class Itemlist extends AbstractBlockModel
                         $sort = (int)$block->_('displayOrderingDirection');
                 endswitch;
             endif;
-            Item::addFindOrder($block->_('displayOrdering'), $sort);
+
+            Item::addFindOrder(
+                str_replace('[]','.'.$this->getDi()->get('configuration')->getLanguageShort(),$block->_('displayOrdering')),
+                $sort)
+            ;
         endif;
 
         if ($block->_('numbersToDisplay')) :
