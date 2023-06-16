@@ -60,7 +60,7 @@ class SeoUtil
             if (count($slugCategories) > 0):
                 /** @var AbstractCollection $slugCategory */
                 foreach ($slugCategories as $slugCategory) :
-                    $slugParts[] = SefUtil::generateSlugFromString($slugCategory->_('name', $language->getShortCode()));
+                    $slugParts[] = SefUtil::generateSlugFromString($slugCategory->getNameField($language->getShortCode()));
                 endforeach;
 
                 $slugs[$language->getShortCode()] = implode($datagroup->slugCategoryDelimiter(), $slugParts);
