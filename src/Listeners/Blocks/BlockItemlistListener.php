@@ -61,15 +61,15 @@ class BlockItemlistListener
             'displayOrdering',
             (new Attributes())->setOptions(ElementHelper::arrayToSelectOptions([
                 'ordering' => '%ADMIN_ITEM_ORDER_ORDERING%',
-                'name' => '%ADMIN_ITEM_ORDER_NAME%',
+                'name[]' => '%ADMIN_ITEM_ORDER_NAME%',
                 'createdAt' => '%ADMIN_ITEM_ORDER_CREATED%',
             ]))
         )->addDropdown(
             'Volgorde sortering ',
             'displayOrderingDirection',
             (new Attributes())->setOptions(ElementHelper::arrayToSelectOptions([
-                'oldest' => 'oldest first',
-                'newest' => 'newest first',
+                'oldest' => 'oldest first, A > Z',
+                'newest' => 'newest first, Z > A',
             ]))
         )->addNumber('%ADMIN_ITEM_ORDER_DISPLAY_NUMBER%', 'numbersToDisplay')
             ->addText(
