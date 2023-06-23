@@ -21,7 +21,7 @@
     "php": ">=8.1",
     "ext-phalcon": "5.1.4",
     "chriskonnertz/open-graph": "^1.0",
-    "vitessecms/language": "^1.0.0",
+    "vitessecms/language": "^1.0.1",
     "vitessecms/sef": "^1.0.4",
     "vitessecms/setting": "^1.0.1",
     "vitessecms/core": "^1.2.0",
