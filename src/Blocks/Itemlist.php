@@ -3,7 +3,7 @@
 namespace VitesseCms\Content\Blocks;
 
 use VitesseCms\Block\AbstractBlockModel;
-use VitesseCms\Content\Enum\ItemListEnum;
+use VitesseCms\Content\Enum\ItemListListModeEnum;
 use VitesseCms\Block\Models\Block;
 use VitesseCms\Content\Models\Item;
 use VitesseCms\Core\Helpers\ItemHelper;
@@ -23,18 +23,18 @@ class Itemlist extends AbstractBlockModel
         $parseList = true;
         $list = $block->_('items');
         switch ($block->_('listMode')) :
-            case ItemListEnum::LISTMODE_CURRENT:
+            case ItemListListModeEnum::LISTMODE_CURRENT->value:
                 if ($this->view->hasCurrentItem()) :
                     $list = [$this->view->getCurrentId()];
                 else :
                     $parseList = false;
                 endif;
                 break;
-            case ItemListEnum::LISTMODE_CHILDREN_OF_ITEM:
+            case ItemListListModeEnum::LISTMODE_CHILDREN_OF_ITEM->value:
                 $list = [$block->_('item')];
                 break;
-            case ItemListEnum::LISTMODE_CURRENT_CHILDREN:
-            case ItemListEnum::LISTMODE_CURRENT_PARENT_CHILDREN:
+            case ItemListListModeEnum::LISTMODE_CURRENT_CHILDREN->value:
+            case ItemListListModeEnum::LISTMODE_CURRENT_PARENT_CHILDREN->value:
                 if ($this->view->hasCurrentItem()) :
                     Item::setFindValue('parentId', $this->view->getCurrentId());
                 endif;
@@ -56,13 +56,13 @@ class Itemlist extends AbstractBlockModel
             $items = Item::findAll();
 
             switch ($block->_('listMode')):
-                case ItemListEnum::LISTMODE_CHILDREN_OF_ITEM:
+                case ItemListListModeEnum::LISTMODE_CHILDREN_OF_ITEM->value:
                     $this->parseDatafieldValues($block);
                     $this->setItemDefaults($block);
                     Item::setFindValue('parentId', $block->_('item'));
                     $items = Item::findAll();
                     break;
-                case ItemListEnum::LISTMODE_CURRENT_PARENT_CHILDREN:
+                case ItemListListModeEnum::LISTMODE_CURRENT_PARENT_CHILDREN->value:
                     if (count($items) === 0) :
                         $currentItem = $this->view->getCurrentItem();
                         Item::setFindValue('parentId', $currentItem->getParentId());
@@ -70,7 +70,7 @@ class Itemlist extends AbstractBlockModel
                         $items = Item::findAll();
                     endif;
                     break;
-                case ItemListEnum::LISTMODE_DATAGROUPS:
+                case ItemListListModeEnum::LISTMODE_DATAGROUPS->value:
                     $ids = [];
                     foreach ($list as $key => $id) :
                         $ids[] = $id;
@@ -80,7 +80,7 @@ class Itemlist extends AbstractBlockModel
                     $this->setItemDefaults($block);
                     $items = Item::findAll();
                     break;
-                case ItemListEnum::LISTMODE_HANDPICKED:
+                case ItemListListModeEnum::LISTMODE_HANDPICKED->value:
                     $items = [];
                     foreach ($list as $itemId) :
                         $item = Item::findById($itemId);
