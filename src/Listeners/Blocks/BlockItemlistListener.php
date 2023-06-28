@@ -44,11 +44,16 @@ class BlockItemlistListener
             '%ADMIN_ITEM_ORDER_DISPLAY%',
             'displayOrdering',
             (new Attributes())->setOptions(ElementHelper::EnumToSelectOptions(ItemListDisplayOrderingEnum::cases()))
-        )->addDropdown(
-            'Volgorde sortering ',
-            'displayOrderingDirection',
-            (new Attributes())->setOptions(ElementHelper::EnumToSelectOptions(ItemListDisplayOrderingDirectionEnum::cases()))
-        )->addNumber('%ADMIN_ITEM_ORDER_DISPLAY_NUMBER%', 'numbersToDisplay')
+        );
+
+        if($block->_('displayOrdering') !== ItemListDisplayOrderingEnum::RANDOM->value) {
+            $form->addDropdown(
+                'Volgorde sortering ',
+                'displayOrderingDirection',
+                (new Attributes())->setOptions(ElementHelper::EnumToSelectOptions(ItemListDisplayOrderingDirectionEnum::cases())));
+        }
+
+        $form->addNumber('%ADMIN_ITEM_ORDER_DISPLAY_NUMBER%', 'numbersToDisplay')
         ->addText('%ADMIN_READMORE_TEXT%', 'readmoreText', (new Attributes())->setMultilang());
 
         $options = [['value' => '', 'label' => '%ADMIN_TYPE_TO_SEARCH%', 'selected' => false]];
