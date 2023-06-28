@@ -6,6 +6,8 @@ use Phalcon\Events\Event;
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Models\Block;
 use VitesseCms\Content\Blocks\Itemlist;
+use VitesseCms\Content\Enum\ItemListDisplayOrderingDirectionEnum;
+use VitesseCms\Content\Enum\ItemListDisplayOrderingEnum;
 use VitesseCms\Content\Enum\ItemListListModeEnum;
 use VitesseCms\Content\Forms\BlockItemlistChildrenOfItemSubForm;
 use VitesseCms\Content\Forms\BlockItemlistDatagroupSubForm;
@@ -41,30 +43,15 @@ class BlockItemlistListener
         )->addDropdown(
             '%ADMIN_ITEM_ORDER_DISPLAY%',
             'displayOrdering',
-            (new Attributes())->setOptions(ElementHelper::arrayToSelectOptions([
-                'ordering' => '%ADMIN_ITEM_ORDER_ORDERING%',
-                'name[]' => '%ADMIN_ITEM_ORDER_NAME%',
-                'createdAt' => '%ADMIN_ITEM_ORDER_CREATED%',
-            ]))
+            (new Attributes())->setOptions(ElementHelper::EnumToSelectOptions(ItemListDisplayOrderingEnum::cases()))
         )->addDropdown(
             'Volgorde sortering ',
             'displayOrderingDirection',
-            (new Attributes())->setOptions(ElementHelper::arrayToSelectOptions([
-                'oldest' => 'oldest first, A > Z',
-                'newest' => 'newest first, Z > A',
-            ]))
+            (new Attributes())->setOptions(ElementHelper::EnumToSelectOptions(ItemListDisplayOrderingDirectionEnum::cases()))
         )->addNumber('%ADMIN_ITEM_ORDER_DISPLAY_NUMBER%', 'numbersToDisplay')
-            ->addText(
-                '%ADMIN_READMORE_TEXT%',
-                'readmoreText',
-                (new Attributes())->setMultilang(true)
-            );
+        ->addText('%ADMIN_READMORE_TEXT%', 'readmoreText', (new Attributes())->setMultilang());
 
-        $options = [[
-            'value' => '',
-            'label' => '%ADMIN_TYPE_TO_SEARCH%',
-            'selected' => false,
-        ]];
+        $options = [['value' => '', 'label' => '%ADMIN_TYPE_TO_SEARCH%', 'selected' => false]];
         if ($block->_('readmoreItem')) :
             $selectedItem = $this->itemRepository->getById($block->_('readmoreItem'));
             if ($selectedItem !== null):
