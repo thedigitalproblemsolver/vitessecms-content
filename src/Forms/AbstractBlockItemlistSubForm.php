@@ -3,7 +3,7 @@
 namespace VitesseCms\Content\Forms;
 
 use VitesseCms\Block\Forms\BlockForm;
-use VitesseCms\Content\Enum\ItemListEnum;
+use VitesseCms\Content\Enum\ItemListListModeEnum;
 use VitesseCms\Content\Fields\Toggle;
 use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Datafield\Models\Datafield;
@@ -18,30 +18,12 @@ use VitesseCms\Shop\Fields\ShopPrice;
 
 abstract class AbstractBlockItemlistSubForm
 {
-    /**
-     * @var ItemRepository
-     */
-    protected $itemRepository;
-
-    /**
-     * @var DatagroupRepository
-     */
-    protected $datagroupRepository;
-
-    /**
-     * @var DatafieldRepository
-     */
-    protected $datafieldRepository;
-
     public function __construct(
-        ItemRepository      $itemRepository,
-        DatagroupRepository $datagroupRepository,
-        DatafieldRepository $datafieldRepository
+        protected readonly ItemRepository      $itemRepository,
+        protected readonly DatagroupRepository $datagroupRepository,
+        protected readonly DatafieldRepository $datafieldRepository
     )
     {
-        $this->itemRepository = $itemRepository;
-        $this->datagroupRepository = $datagroupRepository;
-        $this->datafieldRepository = $datafieldRepository;
     }
 
     protected function buildDatafieldValueForm(BlockForm $form, string $datagroupId): void
@@ -86,7 +68,7 @@ abstract class AbstractBlockItemlistSubForm
                                 ));
                                 $options = ElementHelper::modelIteratorToOptions($items);
                                 $options[] = [
-                                    'value' => ItemListEnum::OPTION_CURRENT_ITEM,
+                                    'value' => '{{currentId}}',
                                     'label' => '%FORM_OPTION_ACTIVE_ITEM%',
                                     'selected' => null,
                                 ];

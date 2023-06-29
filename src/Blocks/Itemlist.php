@@ -3,7 +3,9 @@
 namespace VitesseCms\Content\Blocks;
 
 use VitesseCms\Block\AbstractBlockModel;
-use VitesseCms\Content\Enum\ItemListEnum;
+use VitesseCms\Content\Enum\ItemListDisplayOrderingDirectionEnum;
+use VitesseCms\Content\Enum\ItemListDisplayOrderingEnum;
+use VitesseCms\Content\Enum\ItemListListModeEnum;
 use VitesseCms\Block\Models\Block;
 use VitesseCms\Content\Models\Item;
 use VitesseCms\Core\Helpers\ItemHelper;
@@ -22,22 +24,25 @@ class Itemlist extends AbstractBlockModel
 
         $parseList = true;
         $list = $block->_('items');
-        switch ($block->_('listMode')) :
-            case ItemListEnum::LISTMODE_CURRENT:
+        switch ($block->getString('listMode')) :
+            case ItemListListModeEnum::LISTMODE_CURRENT->value:
                 if ($this->view->hasCurrentItem()) :
                     $list = [$this->view->getCurrentId()];
                 else :
                     $parseList = false;
                 endif;
                 break;
-            case ItemListEnum::LISTMODE_CHILDREN_OF_ITEM:
+            case ItemListListModeEnum::LISTMODE_CHILDREN_OF_ITEM->value:
                 $list = [$block->_('item')];
                 break;
-            case ItemListEnum::LISTMODE_CURRENT_CHILDREN:
-            case ItemListEnum::LISTMODE_CURRENT_PARENT_CHILDREN:
+            case ItemListListModeEnum::LISTMODE_CURRENT_CHILDREN->value:
+            case ItemListListModeEnum::LISTMODE_CURRENT_PARENT_CHILDREN->value:
                 if ($this->view->hasCurrentItem()) :
                     Item::setFindValue('parentId', $this->view->getCurrentId());
                 endif;
+                break;
+            default:
+                $parseList = true;
                 break;
         endswitch;
 
@@ -55,14 +60,14 @@ class Itemlist extends AbstractBlockModel
             $this->setItemDefaults($block);
             $items = Item::findAll();
 
-            switch ($block->_('listMode')):
-                case ItemListEnum::LISTMODE_CHILDREN_OF_ITEM:
+            switch ($block->getString('listMode')):
+                case ItemListListModeEnum::LISTMODE_CHILDREN_OF_ITEM->value:
                     $this->parseDatafieldValues($block);
                     $this->setItemDefaults($block);
                     Item::setFindValue('parentId', $block->_('item'));
                     $items = Item::findAll();
                     break;
-                case ItemListEnum::LISTMODE_CURRENT_PARENT_CHILDREN:
+                case ItemListListModeEnum::LISTMODE_CURRENT_PARENT_CHILDREN->value:
                     if (count($items) === 0) :
                         $currentItem = $this->view->getCurrentItem();
                         Item::setFindValue('parentId', $currentItem->getParentId());
@@ -70,7 +75,8 @@ class Itemlist extends AbstractBlockModel
                         $items = Item::findAll();
                     endif;
                     break;
-                case ItemListEnum::LISTMODE_DATAGROUPS:
+                case ItemListListModeEnum::LISTMODE_DATAGROUPS->value:
+                    $die = true;
                     $ids = [];
                     foreach ($list as $key => $id) :
                         $ids[] = $id;
@@ -80,7 +86,7 @@ class Itemlist extends AbstractBlockModel
                     $this->setItemDefaults($block);
                     $items = Item::findAll();
                     break;
-                case ItemListEnum::LISTMODE_HANDPICKED:
+                case ItemListListModeEnum::LISTMODE_HANDPICKED->value:
                     $items = [];
                     foreach ($list as $itemId) :
                         $item = Item::findById($itemId);
@@ -90,6 +96,9 @@ class Itemlist extends AbstractBlockModel
                     endforeach;
                     break;
             endswitch;
+
+            $items = $this->parsedisplayOrderingRandom($items, $block);
+
             /** @var Item $item */
             foreach ($items as $key => $item) :
                 ItemHelper::parseBeforeMainContent($item);
@@ -107,32 +116,40 @@ class Itemlist extends AbstractBlockModel
         endif;
     }
 
+    private function parsedisplayOrderingRandom(array $items, Block $block) :array
+    {
+        if($block->getString('displayOrdering') === ItemListDisplayOrderingEnum::RANDOM->value) {
+            shuffle($items);
+            if ($block->has('numbersToDisplay')) {
+                $items = array_slice($items,0,$block->getInt('numbersToDisplay'));
+            }
+        }
+
+        return $items;
+    }
+
     protected function setItemDefaults(Block $block): void
     {
-        if (!empty($block->_('displayOrdering'))) :
-            $sort = 1;
-            if ($block->_('displayOrderingDirection')) :
-                switch ($block->_('displayOrderingDirection')) :
-                    case 'oldest':
-                        $sort = 1;
-                        break;
-                    case 'newest':
-                        $sort = -1;
-                        break;
-                    default :
-                        $sort = (int)$block->_('displayOrderingDirection');
-                endswitch;
-            endif;
-
-            Item::addFindOrder(
-                str_replace('[]','.'.$this->getDi()->get('configuration')->getLanguageShort(),$block->_('displayOrdering')),
-                $sort)
-            ;
-        endif;
-
-        if ($block->_('numbersToDisplay')) :
-            Item::setFindLimit((int)$block->_('numbersToDisplay'));
-        endif;
+        if ($block->getString('displayOrdering') !== ItemListDisplayOrderingEnum::RANDOM->value) {
+            if($block->has('displayOrderingDirection')) {
+                $sort = match ($block->getString('displayOrderingDirection')) {
+                    ItemListDisplayOrderingDirectionEnum::OLDEST_FIRST->value => 1,
+                    ItemListDisplayOrderingDirectionEnum::NEWEST_FIRST->value => -1,
+                    default => 1
+                };
+                Item::addFindOrder(
+                    str_replace(
+                        '[]',
+                        '.' . $this->getDi()->get('configuration')->getLanguageShort(),
+                        $block->getString('displayOrdering')
+                    ),
+                    $sort
+                );
+            }
+            if ($block->has('numbersToDisplay')) {
+                Item::setFindLimit((int)$block->getInt('numbersToDisplay'));
+            };
+        }
     }
 
     protected function parseDatafieldValues(Block $block): void

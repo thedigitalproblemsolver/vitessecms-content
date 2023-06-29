@@ -6,7 +6,9 @@ use Phalcon\Events\Event;
 use VitesseCms\Block\Forms\BlockForm;
 use VitesseCms\Block\Models\Block;
 use VitesseCms\Content\Blocks\Itemlist;
-use VitesseCms\Content\Enum\ItemListEnum;
+use VitesseCms\Content\Enum\ItemListDisplayOrderingDirectionEnum;
+use VitesseCms\Content\Enum\ItemListDisplayOrderingEnum;
+use VitesseCms\Content\Enum\ItemListListModeEnum;
 use VitesseCms\Content\Forms\BlockItemlistChildrenOfItemSubForm;
 use VitesseCms\Content\Forms\BlockItemlistDatagroupSubForm;
 use VitesseCms\Content\Forms\BlockItemlistHandpickedSubForm;
@@ -19,29 +21,11 @@ use VitesseCms\Form\Models\Attributes;
 
 class BlockItemlistListener
 {
-    /**
-     * @var ItemRepository
-     */
-    private $itemRepository;
-
-    /**
-     * @var DatagroupRepository
-     */
-    private $datagroupRepository;
-
-    /**
-     * @var DatafieldRepository
-     */
-    private $datafieldRepository;
-
     public function __construct(
-        ItemRepository $itemRepository,
-        DatagroupRepository $datagroupRepository,
-        DatafieldRepository $datafieldRepository
+        private readonly ItemRepository $itemRepository,
+        private readonly DatagroupRepository $datagroupRepository,
+        private readonly DatafieldRepository $datafieldRepository
     ){
-        $this->itemRepository = $itemRepository;
-        $this->datagroupRepository = $datagroupRepository;
-        $this->datafieldRepository  =$datafieldRepository;
     }
 
     public function buildBlockForm(Event $event, BlockForm $form, Block $block): void
@@ -55,34 +39,24 @@ class BlockItemlistListener
         $form->addDropdown(
             '%ADMIN_SOURCE%',
             'listMode',
-            (new Attributes())->setOptions(ElementHelper::arrayToSelectOptions(ItemListEnum::LISTMODES))
+            (new Attributes())->setOptions(ElementHelper::EnumToSelectOptions(ItemListListModeEnum::cases()))
         )->addDropdown(
             '%ADMIN_ITEM_ORDER_DISPLAY%',
             'displayOrdering',
-            (new Attributes())->setOptions(ElementHelper::arrayToSelectOptions([
-                'ordering' => '%ADMIN_ITEM_ORDER_ORDERING%',
-                'name[]' => '%ADMIN_ITEM_ORDER_NAME%',
-                'createdAt' => '%ADMIN_ITEM_ORDER_CREATED%',
-            ]))
-        )->addDropdown(
-            'Volgorde sortering ',
-            'displayOrderingDirection',
-            (new Attributes())->setOptions(ElementHelper::arrayToSelectOptions([
-                'oldest' => 'oldest first, A > Z',
-                'newest' => 'newest first, Z > A',
-            ]))
-        )->addNumber('%ADMIN_ITEM_ORDER_DISPLAY_NUMBER%', 'numbersToDisplay')
-            ->addText(
-                '%ADMIN_READMORE_TEXT%',
-                'readmoreText',
-                (new Attributes())->setMultilang(true)
-            );
+            (new Attributes())->setOptions(ElementHelper::EnumToSelectOptions(ItemListDisplayOrderingEnum::cases()))
+        );
 
-        $options = [[
-            'value' => '',
-            'label' => '%ADMIN_TYPE_TO_SEARCH%',
-            'selected' => false,
-        ]];
+        if($block->_('displayOrdering') !== ItemListDisplayOrderingEnum::RANDOM->value) {
+            $form->addDropdown(
+                'Volgorde sortering ',
+                'displayOrderingDirection',
+                (new Attributes())->setOptions(ElementHelper::EnumToSelectOptions(ItemListDisplayOrderingDirectionEnum::cases())));
+        }
+
+        $form->addNumber('%ADMIN_ITEM_ORDER_DISPLAY_NUMBER%', 'numbersToDisplay')
+        ->addText('%ADMIN_READMORE_TEXT%', 'readmoreText', (new Attributes())->setMultilang());
+
+        $options = [['value' => '', 'label' => '%ADMIN_TYPE_TO_SEARCH%', 'selected' => false]];
         if ($block->_('readmoreItem')) :
             $selectedItem = $this->itemRepository->getById($block->_('readmoreItem'));
             if ($selectedItem !== null):
@@ -107,21 +81,21 @@ class BlockItemlistListener
     private function buildListModeForm(BlockForm $form, Block $block): void
     {
         switch ($block->_('listMode')) :
-            case ItemListEnum::LISTMODE_HANDPICKED:
+            case ItemListListModeEnum::LISTMODE_HANDPICKED->value:
                 (new BlockItemlistHandpickedSubForm(
                     $this->itemRepository,
                     $this->datagroupRepository,
                     $this->datafieldRepository
                 ))->getBlockForm($form, $block);
                 break;
-            case ItemListEnum::LISTMODE_CHILDREN_OF_ITEM:
+            case ItemListListModeEnum::LISTMODE_CHILDREN_OF_ITEM->value:
                 (new BlockItemlistChildrenOfItemSubForm(
                     $this->itemRepository,
                     $this->datagroupRepository,
                     $this->datafieldRepository
                 ))->getBlockForm($form, $block);
                 break;
-            case ItemListEnum::LISTMODE_DATAGROUPS:
+            case ItemListListModeEnum::LISTMODE_DATAGROUPS->value:
                 (new BlockItemlistDatagroupSubForm(
                     $this->itemRepository,
                     $this->datagroupRepository,
