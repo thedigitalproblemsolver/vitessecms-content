@@ -30,6 +30,6 @@
     "vitessecms/datagroup": "^1.1.0",
     "vitessecms/block": "^1.1.0",
     "vitessecms/mustache": "^1.2.0",
-    "vitessecms/admin": "^1.2.0"
+    "vitessecms/admin": "^1.2.1"
   }
 }
