@@ -13,6 +13,7 @@ use VitesseCms\Content\Blocks\Texteditor;
 use VitesseCms\Content\Controllers\AdminitemController;
 use VitesseCms\Content\Enum\ItemEnum;
 use VitesseCms\Content\Fields\Model;
+use VitesseCms\Content\Fields\Text;
 use VitesseCms\Content\Listeners\Admin\AdminMenuListener;
 use VitesseCms\Content\Listeners\Blocks\BlockFilterListener;
 use VitesseCms\Content\Listeners\Blocks\BlockFilterResultListener;
@@ -22,6 +23,7 @@ use VitesseCms\Content\Listeners\Blocks\BlockPlainTextListener;
 use VitesseCms\Content\Listeners\Blocks\BlockTexteditorListener;
 use VitesseCms\Content\Listeners\Controllers\AdminItemControllerListener;
 use VitesseCms\Content\Listeners\Fields\ModelListener;
+use VitesseCms\Content\Listeners\Fields\TextListener;
 use VitesseCms\Content\Repositories\AdminRepositoryCollection;
 use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Core\Interfaces\InitiateListenersInterface;
@@ -60,6 +62,7 @@ class InitiateAdminListeners implements InitiateListenersInterface
             new DatafieldRepository()
         ));
         $di->eventsManager->attach(Model::class, new ModelListener());
+        $di->eventsManager->attach(Text::class, new TextListener());
         $di->eventsManager->attach(AdminanalyticsentryController::class, new AdminanalyticsentryControllerListener());
         $di->eventsManager->attach(ItemEnum::ITEM_LISTENER, new ItemListener(new ItemRepository()));
     }

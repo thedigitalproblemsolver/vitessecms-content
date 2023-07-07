@@ -59,10 +59,11 @@ class AdminItemControllerListener
         foreach ($datagroup->getDatafields() as $datafieldArray) :
             $datafield = $datafieldRepository->getById($datafieldArray['id']);
             if ($datafield !== null) :
+                var_dump($datafield->getType());
                 $eventsManager->fire($datafield->getType() . ':beforeItemSave', $item, $datafield);
             endif;
         endforeach;
-
+echo '===b';
         return $item;
     }
 
