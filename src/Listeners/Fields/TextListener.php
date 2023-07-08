@@ -2,6 +2,7 @@
 
 namespace VitesseCms\Content\Listeners\Fields;
 
+use MongoDB\BSON\UTCDateTime;
 use Phalcon\Events\Event;
 use VitesseCms\Database\AbstractCollection;
 use VitesseCms\Datafield\Enum\AdminFieldTextInputTypesEnum;
@@ -13,7 +14,9 @@ class TextListener
     {
         switch($datafield->getInputType()) {
             case AdminFieldTextInputTypesEnum::DATE->value:
-                $item->set($datafield->getCallingName(), \DateTime::createFromFormat( 'Y-m-d', $item->_($datafield->getCallingName())));
+                $item->set($datafield->getCallingName(), new UTCDateTime(
+                    \DateTime::createFromFormat( 'Y-m-d', $item->_($datafield->getCallingName()))
+                ));
             break;
         }
     }

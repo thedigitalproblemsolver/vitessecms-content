@@ -39,6 +39,8 @@ class Text extends AbstractField
                 $form->addHidden($datafield->getCallingName());
                 break;
             case AdminFieldTextInputTypesEnum::DATE->value:
+                //var_dump($data);
+                //die();
                 $form->addDate($datafield->getNameField(),$datafield->getCallingName(), $attributes);
                 break;
             default:
