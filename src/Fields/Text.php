@@ -2,6 +2,7 @@
 
 namespace VitesseCms\Content\Fields;
 
+use VitesseCms\Datafield\Enum\AdminFieldTextInputTypesEnum;
 use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Database\AbstractCollection;
 use VitesseCms\Datafield\AbstractField;
@@ -19,23 +20,28 @@ class Text extends AbstractField
     )
     {
         switch ($datafield->getInputType()):
-            case 'number':
+            case AdminFieldTextInputTypesEnum::NUMBER->value:
                 $form->addNumber($datafield->getNameField(), $datafield->getCallingName(), $attributes);
                 break;
-            case 'tel':
+            case AdminFieldTextInputTypesEnum::PHONE->value:
                 $form->addPhone($datafield->getNameField(), $datafield->getCallingName(), $attributes);
                 break;
-            case 'text':
+            case AdminFieldTextInputTypesEnum::TEXT->value:
                 $form->addText($datafield->getNameField(), $datafield->getCallingName(), $attributes);
                 break;
-            case 'url':
+            case AdminFieldTextInputTypesEnum::URL->value:
                 $form->addUrl($datafield->getNameField(), $datafield->getCallingName(), $attributes);
                 break;
-            case 'email':
+            case AdminFieldTextInputTypesEnum::EMAIL->value:
                 $form->addEmail($datafield->getNameField(), $datafield->getCallingName(), $attributes);
                 break;
-            case 'hidden':
+            case AdminFieldTextInputTypesEnum::HIDDEN->value:
                 $form->addHidden($datafield->getCallingName());
+                break;
+            case AdminFieldTextInputTypesEnum::DATE->value:
+                //var_dump($data);
+                //die();
+                $form->addDate($datafield->getNameField(),$datafield->getCallingName(), $attributes);
                 break;
             default:
                 var_dump($datafield->getInputType());
