@@ -14,10 +14,11 @@ class TextListener
     {
         switch($datafield->getInputType()) {
             case AdminFieldTextInputTypesEnum::DATE->value:
-                $item->set($datafield->getCallingName(), new UTCDateTime(
-                    \DateTime::createFromFormat( 'Y-m-d', $item->_($datafield->getCallingName()))
-                ));
-            break;
+                $date = \DateTime::createFromFormat( 'Y-m-d', $item->_($datafield->getCallingName()));
+                if($date) {
+                    $item->set($datafield->getCallingName(), new UTCDateTime($date));
+                }
+                break;
         }
     }
 }
