@@ -54,7 +54,8 @@ class BlockItemlistListener
         }
 
         $form->addNumber('%ADMIN_ITEM_ORDER_DISPLAY_NUMBER%', 'numbersToDisplay')
-        ->addText('%ADMIN_READMORE_TEXT%', 'readmoreText', (new Attributes())->setMultilang());
+            ->addNumber('%CONTENT_ITEMS_ON_PAGE%', 'itemsOnPage')
+            ->addText('%ADMIN_READMORE_TEXT%', 'readmoreText', (new Attributes())->setMultilang());
 
         $options = [['value' => '', 'label' => '%ADMIN_TYPE_TO_SEARCH%', 'selected' => false]];
         if ($block->_('readmoreItem')) :
