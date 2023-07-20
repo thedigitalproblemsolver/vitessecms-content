@@ -3,6 +3,7 @@
 namespace VitesseCms\Content\Blocks;
 
 use Phalcon\Di\Di;
+use Phalcon\Http\Request;
 use VitesseCms\Admin\Helpers\PaginationHelper;
 use VitesseCms\Block\AbstractBlockModel;
 use VitesseCms\Configuration\Enums\ConfigurationEnum;
@@ -41,6 +42,7 @@ class Itemlist extends AbstractBlockModel
     private readonly SettingService $settingService;
     private readonly ConfigService $configService;
     private ?int $findLimit;
+    private readonly Request $request;
 
     public function __construct(ViewService $view, Di $di)
     {
@@ -49,6 +51,7 @@ class Itemlist extends AbstractBlockModel
         $this->settingService = $di->get('eventsManager')->fire(SettingEnum::ATTACH_SERVICE_LISTENER->value, new \stdClass());
         $this->itemRepository = $di->get('eventsManager')->fire(ItemEnum::GET_REPOSITORY, new \stdClass());
         $this->configService = $di->get('eventsManager')->fire(ConfigurationEnum::ATTACH_SERVICE_LISTENER->value, new \stdClass());
+        $this->request = $di->get('request');
         $this->findValueIterator = new FindValueIterator();
         $this->findOrderIterator = new FindOrderIterator();
         $this->findLimit = null;
@@ -142,8 +145,13 @@ class Itemlist extends AbstractBlockModel
             }
 
             $this->parseReadmore($block);
-            //$pagination = new PaginationHelper($items, $this->urlService,0,4);
-            $block->set('items', $items);
+            if($block->has('itemsOnPage')) {
+                $pagination = new PaginationHelper($items, $this->urlService, $this->request->get('offset','int', 0), $block->getInt('itemsOnPage'));
+                $block->set('items', $pagination->getSliced());
+                $block->set('pagination', $pagination);
+            } else {
+                $block->set('items', $items);
+            }
         endif;
     }
 
@@ -258,6 +266,11 @@ class Itemlist extends AbstractBlockModel
                 $params['imageName'] = $this->settingService->getString('WEBSITE_DEFAULT_NAME');
             }
         }
+
+        if($block->has('pagination')) {
+            $params['pagination'] = $block->_('pagination');
+        }
+
         return $params;
     }
 }
