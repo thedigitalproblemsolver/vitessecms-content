@@ -18,7 +18,10 @@ class ItemRepository
     ): ItemIterator
     {
         Item::setFindPublished($hideUnpublished);
-        Item::addFindOrder('name');
+        if ($findValues === null) {
+            Item::addFindOrder('name');
+        }
+        
         if ($limit !== null) {
             Item::setFindLimit($limit);
         }
