@@ -189,7 +189,6 @@ class Itemlist extends AbstractBlockModel
         if ($block->getString('displayOrdering') !== ItemListDisplayOrderingEnum::RANDOM->value) {
             if($block->has('displayOrderingDirection')) {
                 $sort = match ($block->getString('displayOrderingDirection')) {
-                    ItemListDisplayOrderingDirectionEnum::OLDEST_FIRST->value => 1,
                     ItemListDisplayOrderingDirectionEnum::NEWEST_FIRST->value => -1,
                     default => 1
                 };
