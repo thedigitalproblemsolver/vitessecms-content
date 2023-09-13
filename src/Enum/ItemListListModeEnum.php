@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Enum;
 
+use Exception;
 use VitesseCms\Form\Interfaces\SelectOptionEnumInterface;
 
 enum ItemListListModeEnum: string implements SelectOptionEnumInterface
@@ -14,7 +16,7 @@ enum ItemListListModeEnum: string implements SelectOptionEnumInterface
     case LISTMODE_HANDPICKED = 'handpicked';
     case LISTMODE_DATAGROUPS = 'datagroups';
 
-    public static function getLabel( $label): string
+    public static function getLabel($label): string
     {
         return match ($label) {
             self::LISTMODE_CURRENT => '%ADMIN_ITEMLIST_MODE_CURRENT_ITEM%',
@@ -24,7 +26,7 @@ enum ItemListListModeEnum: string implements SelectOptionEnumInterface
             self::LISTMODE_CURRENT_CHILDREN_OF_PARENT => '%ADMIN_ITEMLIST_MODE_CHILDREN_FROM_PARENT_OF_ITEM_OR_SELECTED%',
             self::LISTMODE_HANDPICKED => '%ADMIN_ITEMLIST_MODE_HANDPICKED_ITEMS%',
             self::LISTMODE_DATAGROUPS => '%ADMIN_ITEMLIST_MODE_DATAGROUP%',
-            default => throw new \Exception('Unexpected match value')
+            default => throw new Exception('Unexpected match value')
         };
     }
 }
