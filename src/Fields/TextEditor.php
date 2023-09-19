@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Fields;
 
 use VitesseCms\Database\AbstractCollection;
-use VitesseCms\Form\AbstractForm;
-use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Datafield\AbstractField;
+use VitesseCms\Datafield\Models\Datafield;
+use VitesseCms\Form\AbstractForm;
 use VitesseCms\Form\Interfaces\AbstractFormInterface;
 use VitesseCms\Form\Models\Attributes;
 
@@ -16,8 +18,7 @@ class TextEditor extends AbstractField
         Datafield $datafield,
         Attributes $attributes,
         AbstractCollection $data = null
-    )
-    {
+    ) {
         $form->addEditor($datafield->getNameField(), $datafield->getCallingName(), $attributes);
     }
 
@@ -25,11 +26,10 @@ class TextEditor extends AbstractField
         AbstractFormInterface $filter,
         Datafield $datafield,
         AbstractCollection $data = null
-    ): void
-    {
+    ): void {
         $filter->addHidden(
             'filter[textFields][' . uniqid('', false) . ']',
-            (new Attributes())->setDefaultValue($datafield->getCallingName())
+            $datafield->getCallingName()
         );
     }
 
@@ -37,8 +37,7 @@ class TextEditor extends AbstractField
         AbstractCollection $item,
         string $languageShort,
         Datafield $datafield
-    )
-    {
+    ) {
         $result = $item->_($datafield->getCallingName(), $languageShort);
         if (is_string($result)) :
             return trim(strip_tags($result));

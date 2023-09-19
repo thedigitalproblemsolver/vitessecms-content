@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Fields;
 
-use VitesseCms\Datafield\Enum\AdminFieldTextInputTypesEnum;
-use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Database\AbstractCollection;
 use VitesseCms\Datafield\AbstractField;
+use VitesseCms\Datafield\Enum\AdminFieldTextInputTypesEnum;
+use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Form\AbstractForm;
 use VitesseCms\Form\Interfaces\AbstractFormInterface;
 use VitesseCms\Form\Models\Attributes;
@@ -17,8 +19,7 @@ class Text extends AbstractField
         Datafield $datafield,
         Attributes $attributes,
         AbstractCollection $data = null
-    )
-    {
+    ) {
         switch ($datafield->getInputType()):
             case AdminFieldTextInputTypesEnum::NUMBER->value:
                 $form->addNumber($datafield->getNameField(), $datafield->getCallingName(), $attributes);
@@ -41,7 +42,7 @@ class Text extends AbstractField
             case AdminFieldTextInputTypesEnum::DATE->value:
                 //var_dump($data);
                 //die();
-                $form->addDate($datafield->getNameField(),$datafield->getCallingName(), $attributes);
+                $form->addDate($datafield->getNameField(), $datafield->getCallingName(), $attributes);
                 break;
             default:
                 var_dump($datafield->getInputType());
@@ -53,35 +54,29 @@ class Text extends AbstractField
         AbstractFormInterface $filter,
         Datafield $datafield,
         AbstractCollection $data = null
-    ): void
-    {
+    ): void {
         $fieldName = 'filter[' . $datafield->getCallingName() . ']';
         switch ($datafield->_('inputType')) :
             case 'number':
                 $this->di->assets->loadSlider();
                 $fieldName = str_replace('filter[', 'filter[range][', $fieldName);
-                $filter->_(
-                    'text',
+                $filter->addNumber(
                     $datafield->getNameField(),
-                    $fieldName,
-                    [
-                        'data-slider-id' => 'silder-' . $datafield->_('calling_name'),
-                        'data-slider-min' => '0',
-                        'data-slider-max' => '40',
-                        'data-slider-step' => '1',
-                        'data-slider-value' => '[1,40]',
-                        'inputClass' => 'slider',
-                    ]
+                    $fieldName
+                /*[
+                    'data-slider-id' => 'silder-' . $datafield->_('calling_name'),
+                    'data-slider-min' => '0',
+                    'data-slider-max' => '40',
+                    'data-slider-step' => '1',
+                    'data-slider-value' => '[1,40]',
+                    'inputClass' => 'slider',
+                ]*/
                 );
                 break;
             default:
-                $filter->_(
-                    'hidden',
-                    null,
+                $filter->addHidden(
                     'filter[textFields][' . uniqid('', true) . ']',
-                    [
-                        'value' => $datafield->getCallingName(),
-                    ]
+                    $datafield->getCallingName()
                 );
                 break;
         endswitch;
