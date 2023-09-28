@@ -12,7 +12,7 @@ use VitesseCms\Form\AbstractForm;
 use VitesseCms\Form\Interfaces\AbstractFormInterface;
 use VitesseCms\Form\Models\Attributes;
 
-class Text extends AbstractField
+final class Text extends AbstractField
 {
     public function buildItemFormElement(
         AbstractForm $form,
@@ -40,11 +40,10 @@ class Text extends AbstractField
                 $form->addHidden($datafield->getCallingName());
                 break;
             case AdminFieldTextInputTypesEnum::DATE->value:
-                //var_dump($data);
-                //die();
                 $form->addDate($datafield->getNameField(), $datafield->getCallingName(), $attributes);
                 break;
             default:
+                var_dump($datafield->getNameField());
                 var_dump($datafield->getInputType());
                 die();
         endswitch;
