@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace VitesseCms\Content\Fields;
@@ -24,8 +25,9 @@ class Model extends AbstractField
             $model::setFindLimit($datafield->getInt('displayLimit'));
         endif;
 
-        if (!empty($datafield->getDatagroup())):
-            $model::setFindValue('datagroup', ['$in' => [$datafield->getDatagroup()]]);
+
+        if (isset($datafield->datagroups) && is_array($datafield->datagroups)):
+            $model::setFindValue('datagroup', ['$in' => $datafield->datagroups]);
         endif;
 
         $attributes->setOptions(ElementHelper::arrayToSelectOptions($model::findAll()));
