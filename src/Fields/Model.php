@@ -30,7 +30,12 @@ class Model extends AbstractField
             $model::setFindValue('datagroup', ['$in' => $datafield->datagroups]);
         endif;
 
-        $attributes->setOptions(ElementHelper::arrayToSelectOptions($model::findAll()));
+        $attributes->setOptions(
+            ElementHelper::arrayToSelectOptions(
+                $model::findAll(),
+                [$attributes->getDefaultValue()]
+            )
+        );
 
         if ($datafield->_('useSelect2')) :
             $attributes->setInputClass('select2');
