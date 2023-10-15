@@ -1,7 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Blocks;
 
+use MongoDB\BSON\ObjectID;
 use VitesseCms\Block\AbstractBlockModel;
 use VitesseCms\Block\Models\Block;
 use VitesseCms\Block\Models\BlockPosition;
@@ -9,7 +12,7 @@ use VitesseCms\Content\Models\Item;
 use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Datagroup\Models\Datagroup;
 use VitesseCms\Form\Forms\BaseForm;
-use MongoDB\BSON\ObjectID;
+
 use function is_object;
 
 class Filter extends AbstractBlockModel
@@ -24,11 +27,11 @@ class Filter extends AbstractBlockModel
 
         $templateParts = explode('/', $block->_('template'));
         $templateParts = array_reverse($templateParts);
-        $templatePath = $this->di->config->get('defaultTemplateDir') .
+        $templatePath = $this->getDi()->get('config')->get('defaultTemplateDir') .
             'views/blocks/Filter/' .
-            ucfirst($templateParts[0]
-            )
-        ;
+            ucfirst(
+                $templateParts[0]
+            );
 
         $filter->addHtml($this->view->renderTemplate('_filter_form', $templatePath));
         $filter->addHtml($this->view->renderTemplate('_filter_container_start', $templatePath));

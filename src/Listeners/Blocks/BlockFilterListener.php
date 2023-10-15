@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Listeners\Blocks;
 
@@ -28,17 +29,18 @@ class BlockFilterListener
     public function __construct(
         DatagroupRepository $datagroupRepository,
         ItemRepository $itemRepository
-    )
-    {
+    ) {
         $this->datagroupRepository = $datagroupRepository;
         $this->itemRepository = $itemRepository;
     }
 
     public function buildBlockForm(Event $event, BlockForm $form): void
     {
-        $datagroups = $this->datagroupRepository->findAll(new FindValueIterator(
-            [new FindValue('component', 'content')]
-        ));
+        $datagroups = $this->datagroupRepository->findAll(
+            new FindValueIterator(
+                [new FindValue('component', 'content')]
+            )
+        );
 
         $datagroupIds = [];
         while ($datagroups->valid()) :
@@ -67,7 +69,7 @@ class BlockFilterListener
 
     public function loadAssets(Event $event, Filter $filter, Block $block): void
     {
-        $block->getDi()->assets->loadFilter();
-        $block->getDi()->assets->loadSelect2();
+        $block->getDi()->get('assets')->loadFilter();
+        $block->getDi()->get('assets')->loadSelect2();
     }
 }
