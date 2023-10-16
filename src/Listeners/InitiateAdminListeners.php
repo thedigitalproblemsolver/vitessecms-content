@@ -43,7 +43,8 @@ class InitiateAdminListeners implements InitiateListenersInterface
                 new DatagroupRepository(),
                 new DatafieldRepository(),
                 new LanguageRepository()
-            )
+            ),
+            new LanguageRepository()
         ));
         $di->eventsManager->attach(MainContent::class, new BlockMainContentListener(
             new DatagroupRepository(),

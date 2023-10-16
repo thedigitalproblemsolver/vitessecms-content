@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Listeners\Services;
 
+use Phalcon\Events\Event;
 use Phalcon\Events\Manager;
 use VitesseCms\Content\Services\ContentService;
 use VitesseCms\Core\Services\UrlService;
@@ -39,8 +41,7 @@ class ContentServiceListener
         Manager $eventsManager,
         LanguageService $languageService,
         SettingService $settingService
-    )
-    {
+    ) {
         $this->view = $viewService;
         $this->url = $urlService;
         $this->eventsManager = $eventsManager;
@@ -48,7 +49,7 @@ class ContentServiceListener
         $this->setting = $settingService;
     }
 
-    public function attach( Event $event): ContentService
+    public function attach(Event $event): ContentService
     {
         return new ContentService($this->view, $this->url, $this->eventsManager, $this->language, $this->setting);
     }

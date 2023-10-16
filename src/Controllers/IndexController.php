@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Controllers;
 
+use stdClass;
 use VitesseCms\Content\Enum\ItemEnum;
 use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Core\AbstractControllerFrontend;
@@ -17,7 +19,7 @@ class IndexController extends AbstractControllerFrontend
     {
         parent::onConstruct();
 
-        $this->itemRepository = $this->eventsManager->fire(ItemEnum::GET_REPOSITORY, new \stdClass());
+        $this->itemRepository = $this->eventsManager->fire(ItemEnum::GET_REPOSITORY, new stdClass());
     }
 
     public function indexAction(): void
@@ -29,9 +31,11 @@ class IndexController extends AbstractControllerFrontend
         $result = ['items' => []];
 
         if ($this->request->isAjax() && strlen($searchString) > 1) {
-            $items = $this->itemRepository->findAll(new FindValueIterator(
-                [new FindValue('name.' . $this->configService->getLanguageShort(), $searchString, 'like')]
-            ));
+            $items = $this->itemRepository->findAll(
+                new FindValueIterator(
+                    [new FindValue('name.' . $this->configService->getLanguageShort(), $searchString, 'like')]
+                )
+            );
 
             if ($items->count() > 0) {
                 while ($items->valid()) {

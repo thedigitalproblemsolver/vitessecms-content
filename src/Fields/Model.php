@@ -1,29 +1,41 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Fields;
 
-use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Database\AbstractCollection;
 use VitesseCms\Datafield\AbstractField;
+use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Form\AbstractForm;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
 
 class Model extends AbstractField
 {
-    public function buildItemFormElement(AbstractForm $form, Datafield $datafield, Attributes $attributes, AbstractCollection $data = null)
-    {
+    public function buildItemFormElement(
+        AbstractForm $form,
+        Datafield $datafield,
+        Attributes $attributes,
+        AbstractCollection $data = null
+    ) {
         $model = $datafield->getModel();
         $model::addFindOrder('name');
         if ($datafield->_('displayLimit') && $datafield->_('displayLimit') > 0):
-            $model::setFindLimit($datafield->_('displayLimit'));
+            $model::setFindLimit($datafield->getInt('displayLimit'));
         endif;
 
-        if (!empty($datafield->getDatagroup())):
-            $model::setFindValue('datagroup', ['$in' => [$datafield->getDatagroup()]]);
+
+        if (isset($datafield->datagroups) && is_array($datafield->datagroups)):
+            $model::setFindValue('datagroup', ['$in' => $datafield->datagroups]);
         endif;
 
-        $attributes->setOptions(ElementHelper::arrayToSelectOptions($model::findAll()));
+        $attributes->setOptions(
+            ElementHelper::arrayToSelectOptions(
+                $model::findAll(),
+                [$attributes->getDefaultValue()]
+            )
+        );
 
         if ($datafield->_('useSelect2')) :
             $attributes->setInputClass('select2');

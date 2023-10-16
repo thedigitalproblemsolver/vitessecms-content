@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Blocks;
 
 use Phalcon\Di\Di;
 use Phalcon\Http\Request;
+use stdClass;
 use VitesseCms\Admin\Helpers\PaginationHelper;
 use VitesseCms\Block\AbstractBlockModel;
 use VitesseCms\Configuration\Enums\ConfigurationEnum;
@@ -28,6 +30,7 @@ use VitesseCms\Database\Utils\MongoUtil;
 use MongoDB\BSON\ObjectID;
 use VitesseCms\Setting\Enum\SettingEnum;
 use VitesseCms\Setting\Services\SettingService;
+
 use function count;
 use function in_array;
 use function is_array;
@@ -47,10 +50,16 @@ class Itemlist extends AbstractBlockModel
     public function __construct(ViewService $view, Di $di)
     {
         parent::__construct($view, $di);
-        $this->urlService = $di->get('eventsManager')->fire(UrlEnum::ATTACH_SERVICE_LISTENER, new \stdClass());
-        $this->settingService = $di->get('eventsManager')->fire(SettingEnum::ATTACH_SERVICE_LISTENER->value, new \stdClass());
-        $this->itemRepository = $di->get('eventsManager')->fire(ItemEnum::GET_REPOSITORY, new \stdClass());
-        $this->configService = $di->get('eventsManager')->fire(ConfigurationEnum::ATTACH_SERVICE_LISTENER->value, new \stdClass());
+        $this->urlService = $di->get('eventsManager')->fire(UrlEnum::ATTACH_SERVICE_LISTENER, new stdClass());
+        $this->settingService = $di->get('eventsManager')->fire(
+            SettingEnum::ATTACH_SERVICE_LISTENER->value,
+            new stdClass()
+        );
+        $this->itemRepository = $di->get('eventsManager')->fire(ItemEnum::GET_REPOSITORY, new stdClass());
+        $this->configService = $di->get('eventsManager')->fire(
+            ConfigurationEnum::ATTACH_SERVICE_LISTENER->value,
+            new stdClass()
+        );
         $this->request = $di->get('request');
         $this->findValueIterator = new FindValueIterator();
         $this->findOrderIterator = new FindOrderIterator();
@@ -145,8 +154,13 @@ class Itemlist extends AbstractBlockModel
             }
 
             $this->parseReadmore($block);
-            if($block->has('itemsOnPage')) {
-                $pagination = new PaginationHelper($items, $this->urlService, $this->request->get('offset','int', 0), $block->getInt('itemsOnPage'));
+            if ($block->has('itemsOnPage')) {
+                $pagination = new PaginationHelper(
+                    $items,
+                    $this->urlService,
+                    $this->request->get('offset', 'int', 0),
+                    $block->getInt('itemsOnPage')
+                );
                 $block->set('items', $pagination->getSliced());
                 $block->set('pagination', $pagination);
             } else {
@@ -155,41 +169,32 @@ class Itemlist extends AbstractBlockModel
         endif;
     }
 
-    private function getItems(): ?ItemIterator
+    public function getTemplateParams(Block $block): array
     {
-        return $this->itemRepository->findAll(
-            $this->findValueIterator,
-            true,
-            $this->findLimit,
-            $this->findOrderIterator
-        );
-    }
-
-    private function parsedisplayOrderingRandom(ItemIterator $items, Block $block) :ItemIterator
-    {
-        if($block->getString('displayOrdering') === ItemListDisplayOrderingEnum::RANDOM->value) {
-            $itemsArray = [];
-            while ($items->valid()) {
-                $itemsArray[] = $items->current();
-                $items->next();
+        $params = parent::getTemplateParams($block);
+        $params['UPLOAD_URI'] = $this->configService->getUploadUri();
+        if (substr_count($this->getTemplate(), 'header_image') > 0) {
+            if ($this->has('headerImage')) {
+                $params['image'] = $this->configService->getUploadUri() . $this->getString('headerImage');
+            } elseif ($this->settingService->has('HEADER_IMAGE_DEFAULT')) {
+                $params['image'] = $this->configService->getUploadUri() .
+                    $this->settingService->getString('HEADER_IMAGE_DEFAULT');
+                $params['imageName'] = $this->settingService->getString('WEBSITE_DEFAULT_NAME');
             }
-            shuffle($itemsArray);
-            if ($block->has('numbersToDisplay')) {
-                $itemsArray = array_slice($itemsArray,0,$block->getInt('numbersToDisplay'));
-            }
-
-            return new ItemIterator($itemsArray);
         }
 
-        return $items;
+        if ($block->has('pagination')) {
+            $params['pagination'] = $block->_('pagination');
+        }
+
+        return $params;
     }
 
     protected function setItemDefaults(Block $block): void
     {
         if ($block->getString('displayOrdering') !== ItemListDisplayOrderingEnum::RANDOM->value) {
-            if($block->has('displayOrderingDirection')) {
+            if ($block->has('displayOrderingDirection')) {
                 $sort = match ($block->getString('displayOrderingDirection')) {
-                    ItemListDisplayOrderingDirectionEnum::OLDEST_FIRST->value => 1,
                     ItemListDisplayOrderingDirectionEnum::NEWEST_FIRST->value => -1,
                     default => 1
                 };
@@ -206,7 +211,7 @@ class Itemlist extends AbstractBlockModel
             }
             if ($block->has('numbersToDisplay')) {
                 $this->findLimit = $block->getInt('numbersToDisplay');
-            };
+            }
         }
     }
 
@@ -252,25 +257,32 @@ class Itemlist extends AbstractBlockModel
         endif;
     }
 
-    public function getTemplateParams(Block $block): array
+    private function getItems(): ?ItemIterator
     {
-        $params = parent::getTemplateParams($block);
-        $params['UPLOAD_URI'] = $this->configService->getUploadUri();
-        if(substr_count($this->getTemplate(), 'header_image') > 0 ) {
-            if ($this->has('headerImage')) {
-                $params['image'] = $this->configService->getUploadUri().$this->getString('headerImage');
-            } elseif($this->settingService->has('HEADER_IMAGE_DEFAULT')) {
-                $params['image'] = $this->configService->getUploadUri().
-                    $this->settingService->getString('HEADER_IMAGE_DEFAULT')
-                ;
-                $params['imageName'] = $this->settingService->getString('WEBSITE_DEFAULT_NAME');
+        return $this->itemRepository->findAll(
+            $this->findValueIterator,
+            true,
+            $this->findLimit,
+            $this->findOrderIterator
+        );
+    }
+
+    private function parsedisplayOrderingRandom(ItemIterator $items, Block $block): ItemIterator
+    {
+        if ($block->getString('displayOrdering') === ItemListDisplayOrderingEnum::RANDOM->value) {
+            $itemsArray = [];
+            while ($items->valid()) {
+                $itemsArray[] = $items->current();
+                $items->next();
             }
+            shuffle($itemsArray);
+            if ($block->has('numbersToDisplay')) {
+                $itemsArray = array_slice($itemsArray, 0, $block->getInt('numbersToDisplay'));
+            }
+
+            return new ItemIterator($itemsArray);
         }
 
-        if($block->has('pagination')) {
-            $params['pagination'] = $block->_('pagination');
-        }
-
-        return $params;
+        return $items;
     }
 }

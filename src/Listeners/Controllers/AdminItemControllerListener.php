@@ -20,14 +20,14 @@ use VitesseCms\Datagroup\Helpers\DatagroupHelper;
 use VitesseCms\Datagroup\Models\Datagroup;
 use VitesseCms\Form\Helpers\ElementHelper;
 use VitesseCms\Form\Models\Attributes;
+use VitesseCms\Language\Repositories\LanguageRepository;
 
 class AdminItemControllerListener
 {
-    protected $repositories;
-
-    public function __construct(AdminRepositoryCollection $repositories)
-    {
-        $this->repositories = $repositories;
+    public function __construct(
+        private readonly AdminRepositoryCollection $repositories,
+        private readonly LanguageRepository $languageRepository
+    ){
     }
 
     public function beforeModelSave(Event $event, AdminitemController $controller, Item $item): void
@@ -37,14 +37,26 @@ class AdminItemControllerListener
             $item->setIsFilterable($datagroup->hasFilterableFields());
             $item = $this->parseDatafields($item, $datagroup, $this->repositories->datafield, $controller->eventsManager);
             $item = $this->setSeoTitle($item);
-            $item = SeoUtil::setSlugsOnItem(
-                $item,
-                $this->repositories->datagroup,
-                $this->repositories->datafield,
-                $this->repositories->item,
-                $this->repositories->language,
-                $datagroup
-            );
+            if($item->isHomepage()) {
+                $languages = $this->languageRepository->findAll(null, false);
+                $slugs = [];
+                while ($languages->valid()) :
+                    $language = $languages->current();
+                    $slugs[$language->getShortCode()] = null;
+                    $languages->next();
+                endwhile;
+                $item->setSlugs($slugs);
+            } else {
+                $item = SeoUtil::setSlugsOnItem(
+                    $item,
+                    $this->repositories->datagroup,
+                    $this->repositories->datafield,
+                    $this->repositories->item,
+                    $this->repositories->language,
+                    $datagroup
+                );
+            }
+
             $this->clearCache($item, $controller->cache);
         endif;
     }

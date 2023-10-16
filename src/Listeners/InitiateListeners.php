@@ -26,12 +26,15 @@ class InitiateListeners implements InitiateListenersInterface
         if ($di->user->hasAdminAccess()):
             $di->eventsManager->attach('adminMenu', new AdminMenuListener());
         endif;
-        $di->eventsManager->attach(AdminitemController::class, new AdminItemControllerListener(new AdminRepositoryCollection(
-            new ItemRepository(),
-            new DatagroupRepository(),
-            new DatafieldRepository(),
+        $di->eventsManager->attach(AdminitemController::class, new AdminItemControllerListener(
+            new AdminRepositoryCollection(
+                new ItemRepository(),
+                new DatagroupRepository(),
+                new DatafieldRepository(),
+                new LanguageRepository()
+            ),
             new LanguageRepository()
-        )));
+        ));
         $di->eventsManager->attach(MainContent::class, new BlockMainContentListener(
             new DatagroupRepository(),
             $di->view->getCurrentItem()
