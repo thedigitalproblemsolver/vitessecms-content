@@ -42,6 +42,9 @@ final class Text extends AbstractField
             case AdminFieldTextInputTypesEnum::DATE->value:
                 $form->addDate($datafield->getNameField(), $datafield->getCallingName(), $attributes);
                 break;
+            case AdminFieldTextInputTypesEnum::PASSWORD->value:
+                $form->addPassword($datafield->getNameField(), $datafield->getCallingName(), $attributes);
+                break;
             default:
                 var_dump($datafield->getNameField());
                 var_dump($datafield->getInputType());
