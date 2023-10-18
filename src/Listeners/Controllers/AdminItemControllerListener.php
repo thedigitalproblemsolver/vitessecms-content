@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Listeners\Controllers;
 
@@ -27,7 +29,7 @@ class AdminItemControllerListener
     public function __construct(
         private readonly AdminRepositoryCollection $repositories,
         private readonly LanguageRepository $languageRepository
-    ){
+    ) {
     }
 
     public function beforeModelSave(Event $event, AdminitemController $controller, Item $item): void
@@ -35,9 +37,14 @@ class AdminItemControllerListener
         if (!$item->isDeleted()) :
             $datagroup = $this->repositories->datagroup->getById($item->getDatagroup(), false);
             $item->setIsFilterable($datagroup->hasFilterableFields());
-            $item = $this->parseDatafields($item, $datagroup, $this->repositories->datafield, $controller->eventsManager);
+            $item = $this->parseDatafields(
+                $item,
+                $datagroup,
+                $this->repositories->datafield,
+                $controller->eventsManager
+            );
             $item = $this->setSeoTitle($item);
-            if($item->isHomepage()) {
+            if ($item->isHomepage()) {
                 $languages = $this->languageRepository->findAll(null, false);
                 $slugs = [];
                 while ($languages->valid()) :
@@ -62,12 +69,11 @@ class AdminItemControllerListener
     }
 
     protected function parseDatafields(
-        Item                $item,
-        Datagroup           $datagroup,
+        Item $item,
+        Datagroup $datagroup,
         DatafieldRepository $datafieldRepository,
-        Manager             $eventsManager
-    ): Item
-    {
+        Manager $eventsManager
+    ): Item {
         foreach ($datagroup->getDatafields() as $datafieldArray) :
             $datafield = $datafieldRepository->getById($datafieldArray['id']);
             if ($datafield !== null) :
@@ -89,14 +95,16 @@ class AdminItemControllerListener
         foreach ($seoTitleCategories as $datagroupObject) :
             if (is_array($datagroupObject) && $previousItem) :
                 if ($datagroupObject['published'] && $previousItem->getParentId() !== null):
-                    $slugCategories[] = $this->repositories->item->getById(
+                    $previousItem = $this->repositories->item->getById(
                         $previousItem->getParentId(),
                         false
                     );
+                    $slugCategories[] = $previousItem;
                 endif;
             endif;
         endforeach;
-
+        /*var_dump($slugCategories);
+        die();*/
         $slugDatafields = [];
         foreach ($datagroup->getSeoTitleDatafields() as $datafieldObject) :
             if (is_array($datafieldObject) && $datafieldObject['published']) :
@@ -119,9 +127,16 @@ class AdminItemControllerListener
             foreach ($slugDatafields as $datafield) :
                 $datafieldResult = $item->_($datafield->getCallingName(), $language->getShortCode());
                 if (!empty($datafieldResult)) :
-                    if (is_string($datafieldResult)) :
-                        $slugParts[] = $datafieldResult;
-                    elseif (is_array($datafieldResult)) :
+                    if (is_string($datafieldResult)) {
+                        if (MongoUtil::isObjectId($datafieldResult)) {
+                            $resultItem = $this->repositories->item->getById($datafieldResult);
+                            if ($resultItem !== null) :
+                                $slugParts[] = $resultItem->getNameField();
+                            endif;
+                        } else {
+                            $slugParts[] = $datafieldResult;
+                        }
+                    } elseif (is_array($datafieldResult)) {
                         foreach ($datafieldResult as $result) :
                             if (MongoUtil::isObjectId($result)) :
                                 $resultItem = $this->repositories->item->getById($result);
@@ -130,7 +145,7 @@ class AdminItemControllerListener
                                 endif;
                             endif;
                         endforeach;
-                    endif;
+                    }
                 endif;
             endforeach;
 
@@ -141,7 +156,7 @@ class AdminItemControllerListener
                 endforeach;
             endif;
 
-            $seoTitle[$language->getShortCode()] = implode(' ', $slugParts);
+            $seoTitle[$language->getShortCode()] = implode(' - ', $slugParts);
             $languages->next();
         endwhile;
 
@@ -203,11 +218,10 @@ class AdminItemControllerListener
     }
 
     protected function getParentOptionsFromDatagroup(
-        Datagroup           $datagroup,
+        Datagroup $datagroup,
         AdminitemController $controller,
-        array               $parentOptions = []
-    ): array
-    {
+        array $parentOptions = []
+    ): array {
         $items = $this->repositories->item->findAll(
             new FindValueIterator([new FindValue('datagroup', (string)$datagroup->getId())])
         );
@@ -226,12 +240,11 @@ class AdminItemControllerListener
     }
 
     protected function getParentOptionsFromItem(
-        AbstractCollection  $parent,
+        AbstractCollection $parent,
         AdminitemController $controller,
-        array               &$parentOptions = [],
-        array               $prefix = []
-    ): void
-    {
+        array &$parentOptions = [],
+        array $prefix = []
+    ): void {
         $items = $this->repositories->item->findAll(
             new FindValueIterator([new FindValue('parentId', (string)$parent->getId())])
         );
