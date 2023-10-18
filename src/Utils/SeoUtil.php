@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Utils;
 
-use Phalcon\Events\Manager;
 use VitesseCms\Content\Models\Item;
 use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Database\AbstractCollection;
@@ -33,7 +34,7 @@ class SeoUtil
             if (is_array($datagroupArray) && $previousItem) :
                 if ($datagroupArray['published'] && $previousItem->getParentId() !== null):
                     $previousItem = $itemRepository->getById($previousItem->getParentId(), false);
-                    if($previousItem !== null) :
+                    if ($previousItem !== null) :
                         $slugCategories[] = $previousItem;
                     endif;
                 endif;
@@ -60,7 +61,9 @@ class SeoUtil
             if (count($slugCategories) > 0):
                 /** @var AbstractCollection $slugCategory */
                 foreach ($slugCategories as $slugCategory) :
-                    $slugParts[] = SefUtil::generateSlugFromString($slugCategory->getNameField($language->getShortCode()));
+                    $slugParts[] = SefUtil::generateSlugFromString(
+                        $slugCategory->getNameField($language->getShortCode())
+                    );
                 endforeach;
 
                 $slugs[$language->getShortCode()] = implode($datagroup->slugCategoryDelimiter(), $slugParts);

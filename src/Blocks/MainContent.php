@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Blocks;
 
@@ -12,7 +14,7 @@ class MainContent extends AbstractBlockModel
         parent::parse($block);
         if ($this->view->hasCurrentItem()) :
             $item = $this->view->getCurrentItem();
-            if($block->getBool('useDatagroupTemplate')) :
+            if ($block->getBool('useDatagroupTemplate')) :
                 $datagroup = $this->di->get('repositories')->datagroup->getById($item->getDatagroup());
                 if ($datagroup->getTemplate() !== null) :
                     $this->template = $datagroup->getTemplate();
@@ -32,6 +34,7 @@ class MainContent extends AbstractBlockModel
     {
         $params = parent::getTemplateParams($block);
         $params['pagination'] = $block->_('pagination');
+        $params['UPLOAD_URI'] = $this->getDi()->get('configuration')->getUploadUri();
 
         return $params;
     }
