@@ -33,7 +33,6 @@ class FrontendListener
                                 $datafield->getType() . ':beforeExecuteFrontendRoute',
                                 $beforeExecuteRouteDTO
                             );
-                            echo 'b';
                         }
                     }
                 }
