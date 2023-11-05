@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Services;
 
 use Phalcon\Events\Manager;
 use VitesseCms\Content\Helpers\EventVehicleHelper;
-use VitesseCms\Core\Services\AbstractInjectableService;
 use VitesseCms\Core\Services\UrlService;
 use VitesseCms\Core\Services\ViewService;
 use VitesseCms\Language\Services\LanguageService;
@@ -49,7 +50,7 @@ class ContentService
         Manager $eventsManager,
         LanguageService $languageService,
         SettingService $settingService
-    ){
+    ) {
         $this->view = $viewService;
         $this->eventInputs = [];
         $this->url = $urlService;
@@ -62,8 +63,7 @@ class ContentService
         string $content,
         bool $parseTags = true,
         bool $parseSettings = true
-    ): string
-    {
+    ): string {
         if ($parseTags) :
             $content = $this->parseListeners($content, 'contentTag');
         endif;
