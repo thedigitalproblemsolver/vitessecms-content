@@ -1,21 +1,22 @@
 <?php
+
 declare(strict_types=1);
 
 namespace VitesseCms\Content\Blocks;
 
+use MongoDB\BSON\ObjectID;
 use Phalcon\Di\Di;
 use Phalcon\Http\Request;
 use stdClass;
 use VitesseCms\Admin\Helpers\PaginationHelper;
 use VitesseCms\Block\AbstractBlockModel;
+use VitesseCms\Block\Models\Block;
 use VitesseCms\Configuration\Enums\ConfigurationEnum;
 use VitesseCms\Configuration\Services\ConfigService;
 use VitesseCms\Content\Enum\ItemEnum;
 use VitesseCms\Content\Enum\ItemListDisplayOrderingDirectionEnum;
 use VitesseCms\Content\Enum\ItemListDisplayOrderingEnum;
 use VitesseCms\Content\Enum\ItemListListModeEnum;
-use VitesseCms\Block\Models\Block;
-use VitesseCms\Content\Models\Item;
 use VitesseCms\Content\Models\ItemIterator;
 use VitesseCms\Content\Repositories\ItemRepository;
 use VitesseCms\Core\Enum\UrlEnum;
@@ -27,7 +28,6 @@ use VitesseCms\Database\Models\FindOrderIterator;
 use VitesseCms\Database\Models\FindValue;
 use VitesseCms\Database\Models\FindValueIterator;
 use VitesseCms\Database\Utils\MongoUtil;
-use MongoDB\BSON\ObjectID;
 use VitesseCms\Setting\Enum\SettingEnum;
 use VitesseCms\Setting\Services\SettingService;
 
@@ -169,27 +169,6 @@ class Itemlist extends AbstractBlockModel
         endif;
     }
 
-    public function getTemplateParams(Block $block): array
-    {
-        $params = parent::getTemplateParams($block);
-        $params['UPLOAD_URI'] = $this->configService->getUploadUri();
-        if (substr_count($this->getTemplate(), 'header_image') > 0) {
-            if ($this->has('headerImage')) {
-                $params['image'] = $this->configService->getUploadUri() . $this->getString('headerImage');
-            } elseif ($this->settingService->has('HEADER_IMAGE_DEFAULT')) {
-                $params['image'] = $this->configService->getUploadUri() .
-                    $this->settingService->getString('HEADER_IMAGE_DEFAULT');
-                $params['imageName'] = $this->settingService->getString('WEBSITE_DEFAULT_NAME');
-            }
-        }
-
-        if ($block->has('pagination')) {
-            $params['pagination'] = $block->_('pagination');
-        }
-
-        return $params;
-    }
-
     protected function setItemDefaults(Block $block): void
     {
         if ($block->getString('displayOrdering') !== ItemListDisplayOrderingEnum::RANDOM->value) {
@@ -215,6 +194,16 @@ class Itemlist extends AbstractBlockModel
         }
     }
 
+    private function getItems(): ?ItemIterator
+    {
+        return $this->itemRepository->findAll(
+            $this->findValueIterator,
+            true,
+            $this->findLimit,
+            $this->findOrderIterator
+        );
+    }
+
     protected function parseDatafieldValues(Block $block): void
     {
         if (
@@ -225,7 +214,7 @@ class Itemlist extends AbstractBlockModel
                 if (in_array($value, ['both', 'selected', 'notSelected'], true)) :
                     switch ($value) :
                         case 'selected':
-                            $this->findValueIterator->add(new FindValue($name, true));
+                            $this->findValueIterator->add(new FindValue($name, ['$in' => ['1', true]]));
                             break;
                         case 'notSelected':
                             $this->findValueIterator->add(new FindValue($name, ['$in' => ['', false, null]]));
@@ -250,23 +239,6 @@ class Itemlist extends AbstractBlockModel
         endif;
     }
 
-    protected function parseReadmore(Block $block): void
-    {
-        if ($block->has('readmoreItem')) :
-            $block->set('readmoreItem', $this->itemRepository->getById($block->getString('readmoreItem')));
-        endif;
-    }
-
-    private function getItems(): ?ItemIterator
-    {
-        return $this->itemRepository->findAll(
-            $this->findValueIterator,
-            true,
-            $this->findLimit,
-            $this->findOrderIterator
-        );
-    }
-
     private function parsedisplayOrderingRandom(ItemIterator $items, Block $block): ItemIterator
     {
         if ($block->getString('displayOrdering') === ItemListDisplayOrderingEnum::RANDOM->value) {
@@ -284,5 +256,33 @@ class Itemlist extends AbstractBlockModel
         }
 
         return $items;
+    }
+
+    protected function parseReadmore(Block $block): void
+    {
+        if ($block->has('readmoreItem')) :
+            $block->set('readmoreItem', $this->itemRepository->getById($block->getString('readmoreItem')));
+        endif;
+    }
+
+    public function getTemplateParams(Block $block): array
+    {
+        $params = parent::getTemplateParams($block);
+        $params['UPLOAD_URI'] = $this->configService->getUploadUri();
+        if (substr_count($this->getTemplate(), 'header_image') > 0) {
+            if ($this->has('headerImage')) {
+                $params['image'] = $this->configService->getUploadUri() . $this->getString('headerImage');
+            } elseif ($this->settingService->has('HEADER_IMAGE_DEFAULT')) {
+                $params['image'] = $this->configService->getUploadUri() .
+                    $this->settingService->getString('HEADER_IMAGE_DEFAULT');
+                $params['imageName'] = $this->settingService->getString('WEBSITE_DEFAULT_NAME');
+            }
+        }
+
+        if ($block->has('pagination')) {
+            $params['pagination'] = $block->_('pagination');
+        }
+
+        return $params;
     }
 }
