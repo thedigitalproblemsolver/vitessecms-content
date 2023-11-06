@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace VitesseCms\Content\Controllers;
@@ -26,14 +27,20 @@ class IndexController extends AbstractControllerFrontend
     {
     }
 
-    public function searchAction(string $searchString): void
+    public function searchAction(): void
     {
         $result = ['items' => []];
 
-        if ($this->request->isAjax() && strlen($searchString) > 1) {
+        if ($this->request->isAjax() && $this->request->has('search')) {
             $items = $this->itemRepository->findAll(
                 new FindValueIterator(
-                    [new FindValue('name.' . $this->configService->getLanguageShort(), $searchString, 'like')]
+                    [
+                        new FindValue(
+                            'name.' . $this->configService->getLanguageShort(),
+                            $this->request->get('search'),
+                            'like'
+                        )
+                    ]
                 )
             );
 
