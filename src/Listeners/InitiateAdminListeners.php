@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Listeners;
 
@@ -30,6 +32,7 @@ use VitesseCms\Core\Interfaces\InitiateListenersInterface;
 use VitesseCms\Core\Interfaces\InjectableInterface;
 use VitesseCms\Datafield\Repositories\DatafieldRepository;
 use VitesseCms\Datagroup\Repositories\DatagroupRepository;
+use VitesseCms\Language\Models\Language;
 use VitesseCms\Language\Repositories\LanguageRepository;
 
 class InitiateAdminListeners implements InitiateListenersInterface
@@ -37,31 +40,43 @@ class InitiateAdminListeners implements InitiateListenersInterface
     public static function setListeners(InjectableInterface $di): void
     {
         $di->eventsManager->attach('adminMenu', new AdminMenuListener());
-        $di->eventsManager->attach(AdminitemController::class, new AdminItemControllerListener(
-            new AdminRepositoryCollection(
-                new ItemRepository(),
+        $di->eventsManager->attach(
+            AdminitemController::class,
+            new AdminItemControllerListener(
+                new AdminRepositoryCollection(
+                    new ItemRepository(),
+                    new DatagroupRepository(),
+                    new DatafieldRepository(),
+                    new LanguageRepository(Language::class)
+                ),
+                new LanguageRepository(Language::class)
+            )
+        );
+        $di->eventsManager->attach(
+            MainContent::class,
+            new BlockMainContentListener(
                 new DatagroupRepository(),
-                new DatafieldRepository(),
-                new LanguageRepository()
-            ),
-            new LanguageRepository()
-        ));
-        $di->eventsManager->attach(MainContent::class, new BlockMainContentListener(
-            new DatagroupRepository(),
-            $di->view->getCurrentItem()
-        ));
-        $di->eventsManager->attach(Filter::class, new BlockFilterListener(
-            new DatagroupRepository(),
-            new ItemRepository()
-        ));
+                $di->view->getCurrentItem()
+            )
+        );
+        $di->eventsManager->attach(
+            Filter::class,
+            new BlockFilterListener(
+                new DatagroupRepository(),
+                new ItemRepository()
+            )
+        );
         $di->eventsManager->attach(FilterResult::class, new BlockFilterResultListener());
         $di->eventsManager->attach(Texteditor::class, new BlockTexteditorListener());
         $di->eventsManager->attach(PlainText::class, new BlockPlainTextListener());
-        $di->eventsManager->attach(Itemlist::class, new BlockItemlistListener(
-            new ItemRepository(),
-            new DatagroupRepository(),
-            new DatafieldRepository()
-        ));
+        $di->eventsManager->attach(
+            Itemlist::class,
+            new BlockItemlistListener(
+                new ItemRepository(),
+                new DatagroupRepository(),
+                new DatafieldRepository()
+            )
+        );
         $di->eventsManager->attach(Model::class, new ModelListener());
         $di->eventsManager->attach(Text::class, new TextListener());
         $di->eventsManager->attach(AdminanalyticsentryController::class, new AdminanalyticsentryControllerListener());

@@ -20,6 +20,7 @@ use VitesseCms\Core\Interfaces\InitiateListenersInterface;
 use VitesseCms\Core\Interfaces\InjectableInterface;
 use VitesseCms\Datafield\Repositories\DatafieldRepository;
 use VitesseCms\Datagroup\Repositories\DatagroupRepository;
+use VitesseCms\Language\Models\Language;
 use VitesseCms\Language\Repositories\LanguageRepository;
 
 final class InitiateListeners implements InitiateListenersInterface
@@ -36,9 +37,9 @@ final class InitiateListeners implements InitiateListenersInterface
                     new ItemRepository(),
                     new DatagroupRepository(),
                     new DatafieldRepository(),
-                    new LanguageRepository()
+                    new LanguageRepository(Language::class)
                 ),
-                new LanguageRepository()
+                new LanguageRepository(Language::class)
             )
         );
         $di->eventsManager->attach(
