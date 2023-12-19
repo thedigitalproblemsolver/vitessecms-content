@@ -49,7 +49,8 @@ class InitiateAdminListeners implements InitiateListenersInterface
                     new DatafieldRepository(),
                     new LanguageRepository(Language::class)
                 ),
-                new LanguageRepository(Language::class)
+                new LanguageRepository(Language::class),
+                $di->cache
             )
         );
         $di->eventsManager->attach(

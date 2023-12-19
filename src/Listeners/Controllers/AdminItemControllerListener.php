@@ -28,8 +28,18 @@ class AdminItemControllerListener
 {
     public function __construct(
         private readonly AdminRepositoryCollection $repositories,
-        private readonly LanguageRepository $languageRepository
+        private readonly LanguageRepository $languageRepository,
+        private readonly CacheService $cacheService
     ) {
+    }
+
+    public function afterModelSave(Event $event, AdminitemController $controller, Item $item): void
+    {
+        foreach ($item->getSlugs() as $key => $slug) {
+            $this->cacheService->delete(
+                $this->cacheService->getCacheKey('_' . str_replace('/', '_', $slug))
+            );
+        }
     }
 
     public function beforeModelSave(Event $event, AdminitemController $controller, Item $item): void
