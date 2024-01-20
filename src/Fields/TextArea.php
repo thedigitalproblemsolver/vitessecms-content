@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace VitesseCms\Content\Fields;
 
-use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Database\AbstractCollection;
 use VitesseCms\Datafield\AbstractField;
+use VitesseCms\Datafield\Models\Datafield;
 use VitesseCms\Form\AbstractForm;
 use VitesseCms\Form\Interfaces\AbstractFormInterface;
 use VitesseCms\Form\Models\Attributes;
@@ -16,8 +18,7 @@ class TextArea extends AbstractField
         Datafield $datafield,
         Attributes $attributes,
         AbstractCollection $data = null
-    )
-    {
+    ) {
         $form->addTextarea($datafield->getNameField(), $datafield->getCallingName(), $attributes);
     }
 
@@ -30,8 +31,7 @@ class TextArea extends AbstractField
         AbstractFormInterface $filter,
         Datafield $datafield,
         AbstractCollection $data = null
-    ): void
-    {
+    ): void {
         $filter->addHidden(
             'filter[textFields][' . uniqid('', true) . ']',
             (new Attributes())->setDefaultValue($datafield->getCallingName())
