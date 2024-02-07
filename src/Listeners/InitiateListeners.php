@@ -25,12 +25,12 @@ use VitesseCms\Language\Repositories\LanguageRepository;
 
 final class InitiateListeners implements InitiateListenersInterface
 {
-    public static function setListeners(InjectableInterface $di): void
+    public static function setListeners(InjectableInterface $injectable): void
     {
-        if ($di->user->hasAdminAccess()):
-            $di->eventsManager->attach('adminMenu', new AdminMenuListener());
+        if ($injectable->user->hasAdminAccess()):
+            $injectable->eventsManager->attach('adminMenu', new AdminMenuListener());
         endif;
-        $di->eventsManager->attach(
+        $injectable->eventsManager->attach(
             AdminitemController::class,
             new AdminItemControllerListener(
                 new AdminRepositoryCollection(
@@ -40,33 +40,33 @@ final class InitiateListeners implements InitiateListenersInterface
                     new LanguageRepository(Language::class)
                 ),
                 new LanguageRepository(Language::class),
-                $di->cache
+                $injectable->cache
             )
         );
-        $di->eventsManager->attach(
+        $injectable->eventsManager->attach(
             MainContent::class,
             new BlockMainContentListener(
                 new DatagroupRepository(),
-                $di->view->getCurrentItem()
+                $injectable->view->getCurrentItem()
             )
         );
 
-        $di->eventsManager->attach('contentTag', new TagItemListener());
-        $di->eventsManager->attach(
+        $injectable->eventsManager->attach('contentTag', new TagItemListener());
+        $injectable->eventsManager->attach(
             ContentEnum::ATTACH_SERVICE_LISTENER,
             new ContentServiceListener(
-                $di->view,
-                $di->url,
-                $di->eventsManager,
-                $di->language,
-                $di->setting
+                $injectable->view,
+                $injectable->url,
+                $injectable->eventsManager,
+                $injectable->language,
+                $injectable->setting
             )
         );
-        $di->eventsManager->attach(ItemEnum::ITEM_LISTENER, new ItemListener(new ItemRepository()));
-        $di->eventsManager->attach(
+        $injectable->eventsManager->attach(ItemEnum::ITEM_LISTENER, new ItemListener(new ItemRepository()));
+        $injectable->eventsManager->attach(
             FrontendEnum::LISTENER->value,
             new FrontendListener(
-                $di->eventsManager,
+                $injectable->eventsManager,
                 new DatagroupRepository(),
                 new DatafieldRepository()
             )

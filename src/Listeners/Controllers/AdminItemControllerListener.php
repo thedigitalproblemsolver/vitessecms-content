@@ -37,14 +37,14 @@ class AdminItemControllerListener
     {
         foreach ($item->getSlugs() as $key => $slug) {
             $this->cacheService->delete(
-                $this->cacheService->getCacheKey('_' . str_replace('/', '_', $slug))
+                $this->cacheService->getCacheKey('_'.str_replace('/', '_', $slug))
             );
         }
     }
 
     public function beforeModelSave(Event $event, AdminitemController $controller, Item $item): void
     {
-        if (!$item->isDeleted()) :
+        if (!$item->isDeleted()) {
             $datagroup = $this->repositories->datagroup->getById($item->getDatagroup(), false);
             $item->setIsFilterable($datagroup->hasFilterableFields());
             $item = $this->parseDatafields(
@@ -57,11 +57,11 @@ class AdminItemControllerListener
             if ($item->isHomepage()) {
                 $languages = $this->languageRepository->findAll(null, false);
                 $slugs = [];
-                while ($languages->valid()) :
+                while ($languages->valid()) {
                     $language = $languages->current();
                     $slugs[$language->getShortCode()] = null;
                     $languages->next();
-                endwhile;
+                }
                 $item->setSlugs($slugs);
             } else {
                 $item = SeoUtil::setSlugsOnItem(
@@ -75,7 +75,7 @@ class AdminItemControllerListener
             }
 
             $this->clearCache($item, $controller->cache);
-        endif;
+        }
     }
 
     protected function parseDatafields(
@@ -84,12 +84,12 @@ class AdminItemControllerListener
         DatafieldRepository $datafieldRepository,
         Manager $eventsManager
     ): Item {
-        foreach ($datagroup->getDatafields() as $datafieldArray) :
+        foreach ($datagroup->getDatafields() as $datafieldArray) {
             $datafield = $datafieldRepository->getById($datafieldArray['id']);
-            if ($datafield !== null) :
-                $eventsManager->fire($datafield->getType() . ':beforeItemSave', $item, $datafield);
-            endif;
-        endforeach;
+            if (null !== $datafield) {
+                $eventsManager->fire($datafield->getType().':beforeItemSave', $item, $datafield);
+            }
+        }
 
         return $item;
     }
@@ -102,73 +102,73 @@ class AdminItemControllerListener
         $seoTitleCategories = array_reverse($datagroup->getSeoTitleCategories());
 
         $previousItem = clone $item;
-        foreach ($seoTitleCategories as $datagroupObject) :
-            if (is_array($datagroupObject) && $previousItem) :
-                if ($datagroupObject['published'] && $previousItem->getParentId() !== null):
+        foreach ($seoTitleCategories as $datagroupObject) {
+            if (is_array($datagroupObject) && $previousItem) {
+                if ($datagroupObject['published'] && null !== $previousItem->getParentId()) {
                     $previousItem = $this->repositories->item->getById(
                         $previousItem->getParentId(),
                         false
                     );
                     $slugCategories[] = $previousItem;
-                endif;
-            endif;
-        endforeach;
+                }
+            }
+        }
         /*var_dump($slugCategories);
         die();*/
         $slugDatafields = [];
-        foreach ($datagroup->getSeoTitleDatafields() as $datafieldObject) :
-            if (is_array($datafieldObject) && $datafieldObject['published']) :
+        foreach ($datagroup->getSeoTitleDatafields() as $datafieldObject) {
+            if (is_array($datafieldObject) && $datafieldObject['published']) {
                 $slugDatafields[] = $this->repositories->datafield->getById(
                     $datafieldObject['id'],
                     false
                 );
-            endif;
-        endforeach;
+            }
+        }
 
         $seoTitle = [];
         $languages = $this->repositories->language->findAll(null, false);
-        while ($languages->valid()) :
+        while ($languages->valid()) {
             $language = $languages->current();
-            if (!isset($seoTitle[$language->getShortCode()])) :
+            if (!isset($seoTitle[$language->getShortCode()])) {
                 $seoTitle[$language->getShortCode()] = '';
-            endif;
+            }
 
             $slugParts = [];
-            foreach ($slugDatafields as $datafield) :
+            foreach ($slugDatafields as $datafield) {
                 $datafieldResult = $item->_($datafield->getCallingName(), $language->getShortCode());
-                if (!empty($datafieldResult)) :
+                if (!empty($datafieldResult)) {
                     if (is_string($datafieldResult)) {
                         if (MongoUtil::isObjectId($datafieldResult)) {
                             $resultItem = $this->repositories->item->getById($datafieldResult);
-                            if ($resultItem !== null) :
+                            if (null !== $resultItem) {
                                 $slugParts[] = $resultItem->getNameField();
-                            endif;
+                            }
                         } else {
                             $slugParts[] = $datafieldResult;
                         }
                     } elseif (is_array($datafieldResult)) {
-                        foreach ($datafieldResult as $result) :
-                            if (MongoUtil::isObjectId($result)) :
+                        foreach ($datafieldResult as $result) {
+                            if (MongoUtil::isObjectId($result)) {
                                 $resultItem = $this->repositories->item->getById($result);
-                                if ($resultItem !== null) :
+                                if (null !== $resultItem) {
                                     $slugParts[] = $resultItem->getNameField();
-                                endif;
-                            endif;
-                        endforeach;
+                                }
+                            }
+                        }
                     }
-                endif;
-            endforeach;
+                }
+            }
 
-            if (count($slugCategories) > 0):
+            if (count($slugCategories) > 0) {
                 /** @var AbstractCollection $slugCategory */
-                foreach ($slugCategories as $slugCategory) :
+                foreach ($slugCategories as $slugCategory) {
                     $slugParts[] = $slugCategory->getNameField($language->getShortCode());
-                endforeach;
-            endif;
+                }
+            }
 
             $seoTitle[$language->getShortCode()] = implode(' - ', $slugParts);
             $languages->next();
-        endwhile;
+        }
 
         $item->setSeoTitle($seoTitle);
 
@@ -177,9 +177,9 @@ class AdminItemControllerListener
 
     protected function clearCache(Item $item, CacheService $cache): void
     {
-        foreach ($item->getSlugs() as $key => $slug) :
-            $cache->delete($cache->getCacheKey($key . $slug));
-        endforeach;
+        foreach ($item->getSlugs() as $key => $slug) {
+            $cache->delete($cache->getCacheKey($key.$slug));
+        }
     }
 
     public function adminListFilter(Event $event, AdminitemController $controller, AdminlistFormInterface $form): string
@@ -187,23 +187,22 @@ class AdminItemControllerListener
         $form->addHidden('filter[datagroup]');
 
         $request = new Request();
-        if (isset($request->get('filter')['datagroup'])) :
+        if (isset($request->get('filter')['datagroup'])) {
             $mainDatagroup = $this->repositories->datagroup->getById(
                 $request->get('filter')['datagroup']
             );
             $datagroups = DatagroupHelper::getChildrenFromRoot($mainDatagroup);
             /** @var Datagroup $datagroup */
-            foreach ($datagroups as $datagroup) :
-                foreach ($datagroup->getDatafields() as $datafield) :
-                    if ($datafield['published']) :
+            foreach ($datagroups as $datagroup) {
+                foreach ($datagroup->getDatafields() as $datafield) {
+                    if ($datafield['published']) {
                         $datafield = $this->repositories->datafield->getById($datafield['id']);
-                        if ($datafield && $datafield->isPublished()) :
+                        if ($datafield && $datafield->isPublished()) {
                             $datafield->renderAdminlistFilter($form);
-                        endif;
-                    endif;
-                endforeach;
-            endforeach;
-
+                        }
+                    }
+                }
+            }
             $form->addDropdown(
                 'Has as parent',
                 'filter[parentId]',
@@ -216,13 +215,12 @@ class AdminItemControllerListener
                     )
                 )
             );
-
-        endif;
+        }
 
         $form->addPublishedField($form);
 
         return $form->renderForm(
-            $controller->getLink() . '/' . $controller->router->getActionName(),
+            $controller->getLink().'/'.$controller->router->getActionName(),
             'adminFilter'
         );
     }
@@ -235,16 +233,16 @@ class AdminItemControllerListener
         $items = $this->repositories->item->findAll(
             new FindValueIterator([new FindValue('datagroup', (string)$datagroup->getId())])
         );
-        foreach ($items as $item) :
-            if ($item->hasChildren()):
+        foreach ($items as $item) {
+            if ($item->hasChildren()) {
                 $parentOptions[(string)$item->getId()] = $item->_('name');
                 $this->getParentOptionsFromItem(
                     $item,
                     $controller,
                     $parentOptions
                 );
-            endif;
-        endforeach;
+            }
+        }
 
         return $parentOptions;
     }
@@ -259,16 +257,16 @@ class AdminItemControllerListener
             new FindValueIterator([new FindValue('parentId', (string)$parent->getId())])
         );
         $prefix[] = $parent->_('name');
-        foreach ($items as $item) :
-            if ($item->hasChildren()):
-                $parentOptions[(string)$item->getId()] = implode(' > ', $prefix) . ' > ' . $item->_('name');
+        foreach ($items as $item) {
+            if ($item->hasChildren()) {
+                $parentOptions[(string)$item->getId()] = implode(' > ', $prefix).' > '.$item->_('name');
                 $this->getParentOptionsFromItem(
                     $item,
                     $controller,
                     $parentOptions,
                     $prefix
                 );
-            endif;
-        endforeach;
+            }
+        }
     }
 }

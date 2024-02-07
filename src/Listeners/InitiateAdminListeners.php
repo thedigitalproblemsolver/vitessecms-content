@@ -37,10 +37,10 @@ use VitesseCms\Language\Repositories\LanguageRepository;
 
 class InitiateAdminListeners implements InitiateListenersInterface
 {
-    public static function setListeners(InjectableInterface $di): void
+    public static function setListeners(InjectableInterface $injectable): void
     {
-        $di->eventsManager->attach('adminMenu', new AdminMenuListener());
-        $di->eventsManager->attach(
+        $injectable->eventsManager->attach('adminMenu', new AdminMenuListener());
+        $injectable->eventsManager->attach(
             AdminitemController::class,
             new AdminItemControllerListener(
                 new AdminRepositoryCollection(
@@ -50,27 +50,27 @@ class InitiateAdminListeners implements InitiateListenersInterface
                     new LanguageRepository(Language::class)
                 ),
                 new LanguageRepository(Language::class),
-                $di->cache
+                $injectable->cache
             )
         );
-        $di->eventsManager->attach(
+        $injectable->eventsManager->attach(
             MainContent::class,
             new BlockMainContentListener(
                 new DatagroupRepository(),
-                $di->view->getCurrentItem()
+                $injectable->view->getCurrentItem()
             )
         );
-        $di->eventsManager->attach(
+        $injectable->eventsManager->attach(
             Filter::class,
             new BlockFilterListener(
                 new DatagroupRepository(),
                 new ItemRepository()
             )
         );
-        $di->eventsManager->attach(FilterResult::class, new BlockFilterResultListener());
-        $di->eventsManager->attach(Texteditor::class, new BlockTexteditorListener());
-        $di->eventsManager->attach(PlainText::class, new BlockPlainTextListener());
-        $di->eventsManager->attach(
+        $injectable->eventsManager->attach(FilterResult::class, new BlockFilterResultListener());
+        $injectable->eventsManager->attach(Texteditor::class, new BlockTexteditorListener());
+        $injectable->eventsManager->attach(PlainText::class, new BlockPlainTextListener());
+        $injectable->eventsManager->attach(
             Itemlist::class,
             new BlockItemlistListener(
                 new ItemRepository(),
@@ -78,9 +78,12 @@ class InitiateAdminListeners implements InitiateListenersInterface
                 new DatafieldRepository()
             )
         );
-        $di->eventsManager->attach(Model::class, new ModelListener());
-        $di->eventsManager->attach(Text::class, new TextListener());
-        $di->eventsManager->attach(AdminanalyticsentryController::class, new AdminanalyticsentryControllerListener());
-        $di->eventsManager->attach(ItemEnum::ITEM_LISTENER, new ItemListener(new ItemRepository()));
+        $injectable->eventsManager->attach(Model::class, new ModelListener());
+        $injectable->eventsManager->attach(Text::class, new TextListener());
+        $injectable->eventsManager->attach(
+            AdminanalyticsentryController::class,
+            new AdminanalyticsentryControllerListener()
+        );
+        $injectable->eventsManager->attach(ItemEnum::ITEM_LISTENER, new ItemListener(new ItemRepository()));
     }
 }
